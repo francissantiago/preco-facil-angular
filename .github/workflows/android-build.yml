@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17' # Padrão exigido pelo Android moderno
+          java-version: '21' # Padrão exigido pelo Android moderno
 
       - name: 6. Sincronizar o código web com o Android via Capacitor
         run: npx cap sync android
@@ -39,7 +39,7 @@ jobs:
       - name: 7. Dar permissões de execução ao Gradle
         run: chmod +x android/gradlew
 
-      - name: 8. Compilar o APK (Para testar no seu telemóvel)
+      - name: 8. Compilar o APK (Para testar no seu telefone)
         run: |
           cd android
           ./gradlew assembleDebug
