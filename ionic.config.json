@@ -1,0 +1,7 @@
+{
+  "name": "preco-facil-angular",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
