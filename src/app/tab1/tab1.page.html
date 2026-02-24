@@ -1,17 +1,92 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 1
+      Meu Valor
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="large">Meu Valor</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Configuração Base</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Defina suas metas e custos para calcular o valor da sua hora de trabalho.</p>
+      
+      <ion-item class="ion-margin-top">
+        <ion-label position="stacked">Meta Salarial Mensal (R$)</ion-label>
+        <ion-input type="number" [(ngModel)]="config.metaMensal" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-top">
+        <ion-label position="stacked">Custos Fixos Mensais (R$)</ion-label>
+        <ion-note slot="helper">Internet, Luz, MEI, Ferramentas...</ion-note>
+        <ion-input type="number" [(ngModel)]="config.custosFixos" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-top">
+        <ion-label position="stacked">Horas de Trabalho / Mês</ion-label>
+        <ion-note slot="helper">Ex: 160h (8h/dia x 20 dias)</ion-note>
+        <ion-input type="number" [(ngModel)]="config.horasPorMes" (ionInput)="calculateHora()" placeholder="160"></ion-input>
+      </ion-item>
+
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Aparência</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-segment [value]="currentTheme" (ionChange)="changeTheme($event)">
+        <ion-segment-button value="light">
+          <ion-icon name="sunny"></ion-icon>
+          <ion-label>Claro</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="dark">
+          <ion-icon name="moon"></ion-icon>
+          <ion-label>Escuro</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="system">
+          <ion-icon name="phone-portrait"></ion-icon>
+          <ion-label>Sistema</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card color="primary">
+    <ion-card-header>
+      <ion-card-title>Sua Hora Técnica</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <h1 style="font-size: 3em; font-weight: bold; text-align: center;">
+        {{ config.valorHoraCalculado | currency:'BRL' }}
+      </h1>
+      <p style="text-align: center;">Este é o valor mínimo que você deve cobrar por hora para atingir sua meta.</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" (click)="saveConfig()" class="ion-margin-top">
+    Salvar Configurações
+  </ion-button>
+
+  <div class="ion-padding ion-text-center" style="margin-top: 20px;">
+    <p style="font-size: 0.9em;">
+      <a [routerLink]="['/privacy']" style="text-decoration: none; margin-right: 15px;">
+        <ion-icon name="shield-checkmark" style="vertical-align: middle;"></ion-icon> Privacidade
+      </a>
+      <a [routerLink]="['/terms']" style="text-decoration: none;">
+        <ion-icon name="document-text" style="vertical-align: middle;"></ion-icon> Termos de Uso
+      </a>
+    </p>
+  </div>
+
 </ion-content>

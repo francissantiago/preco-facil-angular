@@ -1,17 +1,99 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
+    <ion-title>Orçamentos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
+      <ion-title size="large">Orçamentos</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <ion-accordion-group>
+    <ion-accordion value="new">
+      <ion-item slot="header" color="light">
+        <ion-label>Novo Orçamento</ion-label>
+        <ion-icon name="calculator" slot="start"></ion-icon>
+      </ion-item>
+      <div class="ion-padding" slot="content">
+        
+        <ion-item>
+          <ion-input label="Título do Projeto" labelPlacement="stacked" [(ngModel)]="novoOrcamento.titulo" placeholder="Ex: Site Institucional"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Horas Estimadas" labelPlacement="stacked" type="number" [(ngModel)]="novoOrcamento.horasEstimadas" (ionInput)="calcular()" placeholder="0"></ion-input>
+          <ion-note slot="end" *ngIf="config?.valorHoraCalculado">
+            x {{ config?.valorHoraCalculado | currency:'BRL' }}/h
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+          <ion-select label="Materiais/Custos Extras" labelPlacement="stacked" [multiple]="true" [(ngModel)]="novoOrcamento.materiaisSelecionados" (ionChange)="calcular()" placeholder="Selecione...">
+            <ion-select-option *ngFor="let mat of materiaisDisponiveis" [value]="mat.id">
+              {{ mat.nome }} ({{ mat.custo | currency:'BRL' }})
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Margem de Lucro (%)" labelPlacement="stacked" type="number" [(ngModel)]="novoOrcamento.margemLucroPercentual" (ionInput)="calcular()" placeholder="20"></ion-input>
+        </ion-item>
+
+        <ion-card color="light" class="ion-margin-top">
+          <ion-card-content>
+            <p>Mão de Obra: {{ custoMaoDeObra | currency:'BRL' }}</p>
+            <p>Materiais: {{ custoMateriais | currency:'BRL' }}</p>
+            <p>Lucro Estimado: {{ lucro | currency:'BRL' }}</p>
+            <h2 class="ion-text-center ion-margin-top" style="font-weight: bold; font-size: 1.5em;">
+              Total: {{ novoOrcamento.precoFinal | currency:'BRL' }}
+            </h2>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-button expand="block" (click)="salvarOrcamento()" [disabled]="!novoOrcamento.titulo">
+          Salvar Orçamento
+        </ion-button>
+
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+
+  <h3 class="ion-margin-top">Histórico</h3>
+
+  <div *ngIf="orcamentos.length === 0" class="ion-text-center ion-padding">
+    <p color="medium">Nenhum orçamento salvo.</p>
+  </div>
+
+  <ion-card *ngFor="let orcamento of orcamentos">
+    <ion-card-header>
+      <ion-card-title>{{ orcamento.titulo }}</ion-card-title>
+      <ion-card-subtitle>{{ orcamento.dataCriacao | date:'short' }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Preço Final: {{ orcamento.precoFinal | currency:'BRL' }}</strong></p>
+      <p>Horas: {{ orcamento.horasEstimadas }}h</p>
+      <p>Margem: {{ orcamento.margemLucroPercentual }}%</p>
+      
+      <div class="ion-margin-top" style="display: flex; gap: 10px;">
+        <ion-button fill="outline" color="success" expand="block" style="flex: 1;" (click)="compartilharWhatsApp(orcamento)">
+          <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+          WhatsApp
+        </ion-button>
+        <ion-button fill="outline" color="danger" (click)="removerOrcamento(orcamento.id)">
+          <ion-icon name="trash" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+  
+  <div class="ion-padding ion-text-center ion-margin-top">
+      <p style="font-size: 0.8em; color: gray;">
+        Apoie o desenvolvedor: 
+        <a href="#" style="text-decoration: none; font-weight: bold;">Buy me a Coffee ☕</a>
+      </p>
+  </div>
+
 </ion-content>
