@@ -19,7 +19,7 @@ jobs:
       - name: 2. Configurar o Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Versão recomendada para as versões recentes do Angular
+          node-version: '22' # Versão recomendada para as versões recentes do Angular
 
       - name: 3. Instalar dependências (npm)
         run: npm install
