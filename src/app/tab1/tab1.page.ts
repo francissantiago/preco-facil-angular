@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonNote, IonButton, IonSegment, IonSegmentButton, IonIcon } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
 import { ThemeService, Theme } from '../services/theme.service';
+import { ToastService } from '../services/toast.service';
 import { ConfiguracaoBase } from '../models/interfaces';
 import { addIcons } from 'ionicons';
 import { moon, sunny, settings, phonePortrait, documentText, shieldCheckmark } from 'ionicons/icons';
@@ -19,16 +20,17 @@ import { RouterLink } from '@angular/router';
 export class Tab1Page implements OnInit {
   config: ConfiguracaoBase = {
     nome: '',
-    metaMensal: 0,
-    custosFixos: 0,
-    horasPorMes: 160,
+    metaMensal: null,
+    custosFixos: null,
+    horasPorMes: null,
     valorHoraCalculado: 0
   };
   currentTheme: Theme = 'system';
 
   constructor(
     private dataService: DataService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private toastService: ToastService
   ) {
     addIcons({ moon, sunny, settings, phonePortrait, documentText, shieldCheckmark });
   }
@@ -44,12 +46,14 @@ export class Tab1Page implements OnInit {
 
   saveConfig() {
     this.dataService.updateConfiguracao(this.config);
+    this.toastService.presentToast('Configurações salvas com sucesso!', 'success');
   }
 
   calculateHora() {
-    if (this.config.horasPorMes > 0) {
+    const horas = Number(this.config.horasPorMes);
+    if (horas > 0) {
       const totalNecessario = (Number(this.config.metaMensal) || 0) + (Number(this.config.custosFixos) || 0);
-      this.config.valorHoraCalculado = totalNecessario / Number(this.config.horasPorMes);
+      this.config.valorHoraCalculado = totalNecessario / horas;
     } else {
       this.config.valorHoraCalculado = 0;
     }

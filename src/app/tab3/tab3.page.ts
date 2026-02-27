@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonTextarea, IonAccordionGroup, IonAccordion, IonNote, IonCardSubtitle } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
+import { ToastService } from '../services/toast.service';
 import { Material, Orcamento, ConfiguracaoBase } from '../models/interfaces';
 import { addIcons } from 'ionicons';
 import { logoWhatsapp, trash, calculator, shareSocial } from 'ionicons/icons';
@@ -29,10 +30,16 @@ export class Tab3Page implements OnInit {
   materiaisDisponiveis: Material[] = [];
   config: ConfiguracaoBase | null = null;
 
-  novoOrcamento = {
+  novoOrcamento: {
+    titulo: string;
+    horasEstimadas: number | null;
+    materiaisSelecionados: string[]; // IDs
+    margemLucroPercentual: number | null;
+    precoFinal: number;
+  } = {
     titulo: '',
-    horasEstimadas: 0,
-    materiaisSelecionados: [] as string[], // IDs
+    horasEstimadas: null,
+    materiaisSelecionados: [],
     margemLucroPercentual: 20,
     precoFinal: 0
   };
@@ -43,7 +50,8 @@ export class Tab3Page implements OnInit {
 
   constructor(
     private dataService: DataService,
-    private admobService: AdMobService
+    private admobService: AdMobService,
+    private toastService: ToastService
   ) {
     addIcons({ logoWhatsapp, trash, calculator, shareSocial });
   }
@@ -83,20 +91,23 @@ export class Tab3Page implements OnInit {
 
   salvarOrcamento() {
     this.calcular(); // Garantir atualizado
-    if (!this.novoOrcamento.titulo) return;
+    if (!this.novoOrcamento.titulo) {
+      this.toastService.presentToast('Preencha o título do orçamento.', 'warning');
+      return;
+    }
 
     this.dataService.addOrcamento({
       titulo: this.novoOrcamento.titulo,
-      horasEstimadas: this.novoOrcamento.horasEstimadas,
+      horasEstimadas: this.novoOrcamento.horasEstimadas || 0,
       materiaisUsados: this.novoOrcamento.materiaisSelecionados,
-      margemLucroPercentual: this.novoOrcamento.margemLucroPercentual,
+      margemLucroPercentual: this.novoOrcamento.margemLucroPercentual || 0,
       precoFinal: this.novoOrcamento.precoFinal
     });
 
     // Reset form
     this.novoOrcamento = {
       titulo: '',
-      horasEstimadas: 0,
+      horasEstimadas: null,
       materiaisSelecionados: [],
       margemLucroPercentual: 20,
       precoFinal: 0
@@ -104,10 +115,12 @@ export class Tab3Page implements OnInit {
     this.custoMaoDeObra = 0;
     this.custoMateriais = 0;
     this.lucro = 0;
+    this.toastService.presentToast('Orçamento salvo com sucesso!', 'success');
   }
 
   removerOrcamento(id: string) {
     this.dataService.deleteOrcamento(id);
+    this.toastService.presentToast('Orçamento removido.', 'primary');
   }
 
   acaoComAnuncio(tipo: 'whatsapp' | 'pdf', orcamento: Orcamento) {
@@ -226,7 +239,7 @@ export class Tab3Page implements OnInit {
       
     } catch (error) {
       console.error('Erro ao gerar ou partilhar o PDF', error);
-      alert('Ocorreu um erro ao tentar gerar o PDF. Verifique as permissões da aplicação.');
+      this.toastService.presentToast('Erro ao gerar PDF. Verifique permissões.', 'danger');
     }
   }
 }

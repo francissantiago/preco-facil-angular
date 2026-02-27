@@ -10,9 +10,9 @@ export class DataService {
   private initialState: AppState = {
     configuracaoBase: {
       nome: '',
-      metaMensal: 0,
-      custosFixos: 0,
-      horasPorMes: 160,
+      metaMensal: null,
+      custosFixos: null,
+      horasPorMes: null,
       valorHoraCalculado: 0
     },
     materiais: [],
@@ -64,7 +64,7 @@ export class DataService {
     const newConfig = { ...currentState.configuracaoBase, ...config };
     
     // Recalcular valor hora se necessário
-    if (newConfig.horasPorMes > 0) {
+    if (newConfig.horasPorMes !== null && newConfig.horasPorMes > 0) {
       const totalNecessario = (Number(newConfig.metaMensal) || 0) + (Number(newConfig.custosFixos) || 0);
       newConfig.valorHoraCalculado = totalNecessario / Number(newConfig.horasPorMes);
     } else {

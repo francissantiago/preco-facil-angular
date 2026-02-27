@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonListHeader } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
+import { ToastService } from '../services/toast.service';
 import { Material } from '../models/interfaces';
 import { addIcons } from 'ionicons';
 import { trash, add } from 'ionicons/icons';
@@ -18,7 +19,10 @@ export class Tab2Page implements OnInit {
   materiais: Material[] = [];
   novoMaterial: { nome: string; custo: number | null } = { nome: '', custo: null };
 
-  constructor(private dataService: DataService) {
+  constructor(
+    private dataService: DataService,
+    private toastService: ToastService
+  ) {
     addIcons({ trash, add });
   }
 
@@ -35,10 +39,14 @@ export class Tab2Page implements OnInit {
         custo: Number(this.novoMaterial.custo)
       });
       this.novoMaterial = { nome: '', custo: null };
+      this.toastService.presentToast('Material adicionado com sucesso!', 'success');
+    } else {
+      this.toastService.presentToast('Preencha o nome e o custo do material.', 'warning');
     }
   }
 
   removerMaterial(id: string) {
     this.dataService.deleteMaterial(id);
+    this.toastService.presentToast('Material removido.', 'primary');
   }
 }

@@ -1,8 +1,8 @@
 export interface ConfiguracaoBase {
   nome: string;
-  metaMensal: number;
-  custosFixos: number;
-  horasPorMes: number;
+  metaMensal: number | null;
+  custosFixos: number | null;
+  horasPorMes: number | null;
   valorHoraCalculado: number;
 }
 

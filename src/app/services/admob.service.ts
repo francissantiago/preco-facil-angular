@@ -48,7 +48,7 @@ export class AdMobService {
       adSize: BannerAdSize.ADAPTIVE_BANNER,
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 0,
-      isTesting: true
+      isTesting: false
     };
 
     try {
@@ -80,7 +80,7 @@ export class AdMobService {
   async showRewardedAd(onRewardCallback: () => void) {
     const options: RewardAdOptions = {
       adId: 'ca-app-pub-7605283942830580/2222579166', // ID Oficial de Teste para Vídeo Premiado
-      isTesting: true
+      isTesting: false
     };
 
     try {
