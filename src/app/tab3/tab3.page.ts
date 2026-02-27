@@ -125,17 +125,17 @@ export class Tab3Page implements OnInit {
     const totalFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(orcamento.precoFinal);
     
     let texto = `*Orçamento: ${orcamento.titulo}*\n\n`;
-    texto += `⏳ Horas Estimadas: ${orcamento.horasEstimadas}h\n`;
+    texto += `Horas Estimadas: ${orcamento.horasEstimadas}h\n`;
     
     if (orcamento.materiaisUsados.length > 0) {
-      texto += `🛠 Materiais/Custos:\n`;
+      texto += `Materiais/Custos:\n`;
       orcamento.materiaisUsados.forEach(id => {
         const mat = this.materiaisDisponiveis.find(m => m.id === id);
         if (mat) texto += `- ${mat.nome}\n`;
       });
     }
     
-    texto += `\n💰 *Valor Total: ${totalFormatado}*`;
+    texto += `\n*Valor Total: ${totalFormatado}*`;
     
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank');
