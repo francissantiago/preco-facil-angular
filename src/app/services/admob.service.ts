@@ -19,8 +19,8 @@ export class AdMobService {
   async initializeAdMob() {
     try {
       await AdMob.initialize({
-        testingDevices: ['YOUR_DEVICE_ID'],
-        initializeForTesting: true
+        testingDevices: [],
+        initializeForTesting: false
       });
       
       this.setupListeners();
@@ -44,7 +44,7 @@ export class AdMobService {
 
   async showBanner() {
     const options: BannerAdOptions = {
-      adId: 'ca-app-pub-3940256099942544/6300978111', // ID de Teste do Google para Banner Android
+      adId: 'ca-app-pub-7605283942830580/2940764462', // ID oficial do Google para Banner Android
       adSize: BannerAdSize.ADAPTIVE_BANNER,
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 0,
@@ -79,7 +79,7 @@ export class AdMobService {
 
   async showRewardedAd(onRewardCallback: () => void) {
     const options: RewardAdOptions = {
-      adId: 'ca-app-pub-3940256099942544/5224354917', // ID Oficial de Teste para Vídeo Premiado
+      adId: 'ca-app-pub-7605283942830580/2222579166', // ID Oficial de Teste para Vídeo Premiado
       isTesting: true
     };
 
