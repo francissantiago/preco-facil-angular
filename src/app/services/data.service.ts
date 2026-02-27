@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, from } from 'rxjs';
 import { AppState, ConfiguracaoBase, Material, Orcamento } from '../models/interfaces';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
-  private readonly STORAGE_KEY = 'preco_facil_data';
-
   private initialState: AppState = {
     configuracaoBase: {
+      nome: '',
       metaMensal: 0,
       custosFixos: 0,
       horasPorMes: 160,
@@ -22,26 +22,39 @@ export class DataService {
   private stateSubject = new BehaviorSubject<AppState>(this.initialState);
   public state$ = this.stateSubject.asObservable();
 
-  constructor() {
+  constructor(private storageService: StorageService) {
     this.loadState();
   }
 
-  private loadState() {
-    const savedState = localStorage.getItem(this.STORAGE_KEY);
-    if (savedState) {
-      try {
-        const parsedState = JSON.parse(savedState);
-        this.stateSubject.next({ ...this.initialState, ...parsedState });
-      } catch (e) {
-        console.error('Erro ao carregar estado:', e);
-        this.stateSubject.next(this.initialState);
-      }
+  private async loadState() {
+    try {
+      const [config, materiais, orcamentos] = await Promise.all([
+        this.storageService.obterConfiguracaoBase(),
+        this.storageService.obterMateriais(),
+        this.storageService.obterOrcamentos()
+      ]);
+
+      const loadedState: AppState = {
+        configuracaoBase: config || this.initialState.configuracaoBase,
+        materiais: materiais || [],
+        orcamentos: orcamentos || []
+      };
+
+      this.stateSubject.next(loadedState);
+    } catch (e) {
+      console.error('Erro ao carregar estado do Storage:', e);
+      this.stateSubject.next(this.initialState);
     }
   }
 
   private saveState(newState: AppState) {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newState));
+    // Atualiza o estado em memória imediatamente para a UI reagir
     this.stateSubject.next(newState);
+
+    // Persiste no Storage de forma assíncrona
+    this.storageService.salvarConfiguracaoBase(newState.configuracaoBase);
+    this.storageService.salvarMateriais(newState.materiais);
+    this.storageService.salvarOrcamentos(newState.orcamentos);
   }
 
   // --- Actions ---
@@ -52,8 +65,8 @@ export class DataService {
     
     // Recalcular valor hora se necessário
     if (newConfig.horasPorMes > 0) {
-      const totalNecessario = (newConfig.metaMensal || 0) + (newConfig.custosFixos || 0);
-      newConfig.valorHoraCalculado = totalNecessario / newConfig.horasPorMes;
+      const totalNecessario = (Number(newConfig.metaMensal) || 0) + (Number(newConfig.custosFixos) || 0);
+      newConfig.valorHoraCalculado = totalNecessario / Number(newConfig.horasPorMes);
     } else {
       newConfig.valorHoraCalculado = 0;
     }

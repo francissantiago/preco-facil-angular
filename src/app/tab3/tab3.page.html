@@ -77,11 +77,17 @@
       <p>Horas: {{ orcamento.horasEstimadas }}h</p>
       <p>Margem: {{ orcamento.margemLucroPercentual }}%</p>
       
-      <div class="ion-margin-top" style="display: flex; gap: 10px;">
-        <ion-button fill="outline" color="success" expand="block" style="flex: 1;" (click)="compartilharWhatsApp(orcamento)">
+      <div class="ion-margin-top" style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <ion-button fill="outline" color="success" expand="block" style="flex: 1; min-width: 110px;" (click)="acaoComAnuncio('whatsapp', orcamento)">
           <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
           WhatsApp
         </ion-button>
+        
+        <ion-button fill="outline" color="tertiary" expand="block" style="flex: 1; min-width: 110px;" (click)="acaoComAnuncio('pdf', orcamento)">
+          <ion-icon name="document-text" slot="start"></ion-icon>
+          PDF
+        </ion-button>
+
         <ion-button fill="outline" color="danger" (click)="removerOrcamento(orcamento.id)">
           <ion-icon name="trash" slot="icon-only"></ion-icon>
         </ion-button>
@@ -89,11 +95,11 @@
     </ion-card-content>
   </ion-card>
   
-  <div class="ion-padding ion-text-center ion-margin-top">
+  <!-- <div class="ion-padding ion-text-center ion-margin-top">
       <p style="font-size: 0.8em; color: gray;">
         Apoie o desenvolvedor: 
         <a href="#" style="text-decoration: none; font-weight: bold;">Buy me a Coffee ☕</a>
       </p>
-  </div>
+  </div> -->
 
 </ion-content>

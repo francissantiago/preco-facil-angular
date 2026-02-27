@@ -1,4 +1,5 @@
 export interface ConfiguracaoBase {
+  nome: string;
   metaMensal: number;
   custosFixos: number;
   horasPorMes: number;

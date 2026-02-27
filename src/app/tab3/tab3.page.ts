@@ -6,13 +6,23 @@ import { DataService } from '../services/data.service';
 import { Material, Orcamento, ConfiguracaoBase } from '../models/interfaces';
 import { addIcons } from 'ionicons';
 import { logoWhatsapp, trash, calculator, shareSocial } from 'ionicons/icons';
+import { AdMobService } from '../services/admob.service';
+
+// Imports para gerar e partilhar o PDF
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+
+// Injeção das fontes no pdfMake para suportar acentuação e caracteres latinos
+// (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, IonNote, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonTextarea, IonAccordionGroup, IonAccordion]
+  imports: [IonCardSubtitle, IonNote, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordionGroup, IonAccordion]
 })
 export class Tab3Page implements OnInit {
   orcamentos: Orcamento[] = [];
@@ -31,7 +41,10 @@ export class Tab3Page implements OnInit {
   custoMateriais: number = 0;
   lucro: number = 0;
 
-  constructor(private dataService: DataService) {
+  constructor(
+    private dataService: DataService,
+    private admobService: AdMobService
+  ) {
     addIcons({ logoWhatsapp, trash, calculator, shareSocial });
   }
 
@@ -97,6 +110,17 @@ export class Tab3Page implements OnInit {
     this.dataService.deleteOrcamento(id);
   }
 
+  acaoComAnuncio(tipo: 'whatsapp' | 'pdf', orcamento: Orcamento) {
+    // Chama o serviço de anúncio passando a função que deve ser executada após o vídeo
+    this.admobService.showRewardedAd(() => {
+      if (tipo === 'whatsapp') {
+        this.compartilharWhatsApp(orcamento);
+      } else if (tipo === 'pdf') {
+        this.gerarPDF(orcamento);
+      }
+    });
+  }
+
   compartilharWhatsApp(orcamento: Orcamento) {
     const totalFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(orcamento.precoFinal);
     
@@ -115,5 +139,94 @@ export class Tab3Page implements OnInit {
     
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank');
+  }
+
+  async gerarPDF(orcamento: Orcamento) {
+    const totalFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(orcamento.precoFinal);
+    
+    // 1. Preparar a lista de materiais para a tabela do PDF
+    const linhasMateriais = [];
+    if (orcamento.materiaisUsados && orcamento.materiaisUsados.length > 0) {
+      linhasMateriais.push([{ text: 'Material / Custo Extra', bold: true }, { text: 'Valor', bold: true }]);
+      
+      orcamento.materiaisUsados.forEach(id => {
+        const mat = this.materiaisDisponiveis.find(m => m.id === id);
+        if (mat) {
+          linhasMateriais.push([
+            mat.nome, 
+            new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(mat.custo)
+          ]);
+        }
+      });
+    } else {
+      linhasMateriais.push(['Sem custos extras registados', '-']);
+    }
+
+    // 2. Desenhar a estrutura do documento
+    const nomeEmpresa = this.config?.nome || 'Orçamento';
+    
+    const docDefinition: any = {
+      content: [
+        { text: nomeEmpresa, style: 'header', alignment: 'center' },
+        { text: 'Proposta de Orçamento', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+        
+        { text: `Projeto: ${orcamento.titulo}`, style: 'h3' },
+        { text: `Data: ${new Date().toLocaleDateString('pt-BR')}`, margin: [0, 0, 0, 20] },
+        
+        { text: 'Mão de Obra (Horas Estimadas)', style: 'sectionHeader' },
+        { text: `${orcamento.horasEstimadas}h de trabalho dedicado ao projeto.`, margin: [0, 0, 0, 15] },
+
+        { text: 'Custos Adicionais e Materiais', style: 'sectionHeader' },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['*', 'auto'],
+            body: linhasMateriais
+          },
+          margin: [0, 0, 0, 20]
+        },
+
+        { text: `Valor Total Sugerido: ${totalFormatado}`, style: 'total', alignment: 'right' }
+      ],
+      styles: {
+        header: { fontSize: 22, bold: true, color: '#3880ff' },
+        subheader: { fontSize: 16, color: '#666666' },
+        h3: { fontSize: 14, bold: true },
+        sectionHeader: { fontSize: 12, bold: true, color: '#3880ff', margin: [0, 10, 0, 5] },
+        total: { fontSize: 16, bold: true, marginTop: 20 }
+      }
+    };
+
+    try {
+      // 1. Captura as fontes contornando a checagem estrita do TypeScript
+      const fontesVFS = (pdfFonts as any)['pdfMake'] ? (pdfFonts as any)['pdfMake'].vfs : (pdfFonts as any).vfs;
+
+      // 2. Passa o VFS diretamente como o quarto parâmetro (docDefinition, tableLayouts, fonts, vfs)
+      const pdfDocGenerator = pdfMake.createPdf(docDefinition, fontesVFS);
+      
+      // 3. getBase64() agora é uma Promise (não recebe mais callback)
+      const base64Data = await pdfDocGenerator.getBase64();
+
+      const nomeFicheiro = `orcamento-${orcamento.titulo.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.pdf`;
+
+      // 4. Guardar o ficheiro na cache do telemóvel
+      const savedFile = await Filesystem.writeFile({
+        path: nomeFicheiro,
+        data: base64Data,
+        directory: Directory.Cache
+      });
+
+      // 5. Partilhar ou abrir o PDF com as aplicações nativas do Android
+      await Share.share({
+        title: `Orçamento - ${orcamento.titulo}`,
+        text: 'Segue em anexo a proposta de orçamento.',
+        url: savedFile.uri,
+        dialogTitle: 'Partilhar Orçamento'
+      });
+      
+    } catch (error) {
+      console.error('Erro ao gerar ou partilhar o PDF', error);
+      alert('Ocorreu um erro ao tentar gerar o PDF. Verifique as permissões da aplicação.');
+    }
   }
 }

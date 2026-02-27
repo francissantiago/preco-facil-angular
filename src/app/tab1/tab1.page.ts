@@ -18,6 +18,7 @@ import { RouterLink } from '@angular/router';
 })
 export class Tab1Page implements OnInit {
   config: ConfiguracaoBase = {
+    nome: '',
     metaMensal: 0,
     custosFixos: 0,
     horasPorMes: 160,

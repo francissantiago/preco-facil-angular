@@ -1,1 +1,11 @@
 
+ion-tab-bar.banner-visible {
+  /* 
+    Adiciona margem inferior apenas quando o banner está visível.
+    O tamanho padrão de um banner adaptativo é geralmente em torno de 50px a 60px.
+  */
+  margin-bottom: 60px;
+  
+  /* Adiciona uma borda sutil no topo para separar do conteúdo */
+  border-top: 1px solid var(--ion-color-step-150, rgba(0,0,0,0.1));
+}

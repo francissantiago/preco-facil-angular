@@ -21,6 +21,12 @@
       <p>Defina suas metas e custos para calcular o valor da sua hora de trabalho.</p>
       
       <ion-item class="ion-margin-top">
+        <ion-label position="stacked">Seu Nome / Empresa</ion-label>
+        <ion-note slot="helper">Será usado no orçamento gerado</ion-note>
+        <ion-input type="text" [(ngModel)]="config.nome" placeholder="Ex: Ateliê da Maria"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-top">
         <ion-label position="stacked">Meta Salarial Mensal (R$)</ion-label>
         <ion-input type="number" [(ngModel)]="config.metaMensal" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
       </ion-item>
