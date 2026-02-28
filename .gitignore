@@ -70,4 +70,14 @@ testem.log
 Thumbs.db
 precofacil.base64.txt
 precofacil.keystore
-android/.kotlin/sessions/kotlin-compiler-12233451089638822467.salive
+
+# Android generated files
+android/app/build/
+android/build/
+android/.gradle/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/app/src/main/res/xml/config.xml
+android/capacitor-cordova-android-plugins/
+android/.kotlin/
