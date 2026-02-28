@@ -14,8 +14,16 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Capacitor
+-keep public class com.getcapacitor.BridgeActivity { *; }
+-keep public class com.getcapacitor.Plugin { *; }
+
+# Capacitor Community AdMob (Google Mobile Ads SDK)
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.ads.** { *; }
