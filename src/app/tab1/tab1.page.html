@@ -28,89 +28,157 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding bg-gray-50 dark:bg-zinc-900">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">{{ 'TAB1.TITLE' | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>{{ 'TAB1.CONFIG_BASE_TITLE' | translate }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>{{ 'TAB1.CONFIG_BASE_DESC' | translate }}</p>
+  <div class="space-y-6 max-w-md mx-auto">
+    <!-- Base Configuration Card -->
+    <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm p-6">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+        {{ 'TAB1.CONFIG_BASE_TITLE' | translate }}
+      </h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        {{ 'TAB1.CONFIG_BASE_DESC' | translate }}
+      </p>
       
-      <ion-item class="ion-margin-top">
-        <ion-input [label]="'TAB1.NAME_LABEL' | translate" labelPlacement="stacked" type="text" [(ngModel)]="config.nome" [placeholder]="'TAB1.NAME_PLACEHOLDER' | translate"></ion-input>
-        <ion-note slot="helper">{{ 'TAB1.NAME_HELPER' | translate }}</ion-note>
-      </ion-item>
+      <div class="space-y-4">
+        <div>
+          <ion-input
+            [label]="'TAB1.NAME_LABEL' | translate"
+            labelPlacement="stacked"
+            fill="outline"
+            shape="round"
+            type="text"
+            [ngModel]="config().nome"
+            (ngModelChange)="updateConfig('nome', $event)"
+            [placeholder]="'TAB1.NAME_PLACEHOLDER' | translate"
+            class="custom-input"
+          ></ion-input>
+          <p class="text-xs text-gray-500 mt-1 ml-1">{{ 'TAB1.NAME_HELPER' | translate }}</p>
+        </div>
 
-      <ion-item class="ion-margin-top">
-        <ion-input [label]="'TAB1.SALARY_GOAL_LABEL' | translate" label-placement="stacked" type="number" [(ngModel)]="config.metaMensal" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
-      </ion-item>
+        <ion-input
+          [label]="'TAB1.SALARY_GOAL_LABEL' | translate"
+          label-placement="stacked"
+          fill="outline"
+          shape="round"
+          type="number"
+          [ngModel]="config().metaMensal"
+          (ngModelChange)="updateConfig('metaMensal', $event)"
+          placeholder="0.00"
+          class="custom-input"
+        ></ion-input>
 
-      <ion-item class="ion-margin-top">
-        <ion-input [label]="'TAB1.FIXED_COSTS_LABEL' | translate" label-placement="stacked" type="number" [(ngModel)]="config.custosFixos" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
-        <ion-note slot="helper">{{ 'TAB1.FIXED_COSTS_HELPER' | translate }}</ion-note>
-      </ion-item>
+        <div>
+          <ion-input
+            [label]="'TAB1.FIXED_COSTS_LABEL' | translate"
+            label-placement="stacked"
+            fill="outline"
+            shape="round"
+            type="number"
+            [ngModel]="config().custosFixos"
+            (ngModelChange)="updateConfig('custosFixos', $event)"
+            placeholder="0.00"
+            class="custom-input"
+          ></ion-input>
+          <p class="text-xs text-gray-500 mt-1 ml-1">{{ 'TAB1.FIXED_COSTS_HELPER' | translate }}</p>
+        </div>
 
-      <ion-item class="ion-margin-top">
-        <ion-input [label]="'TAB1.HOURS_LABEL' | translate" label-placement="stacked" type="number" [(ngModel)]="config.horasPorMes" (ionInput)="calculateHora()" placeholder="160"></ion-input>
-        <ion-note slot="helper">{{ 'TAB1.HOURS_HELPER' | translate }}</ion-note>
-      </ion-item>
+        <div>
+          <ion-input
+            [label]="'TAB1.HOURS_LABEL' | translate"
+            label-placement="stacked"
+            fill="outline"
+            shape="round"
+            type="number"
+            [ngModel]="config().horasPorMes"
+            (ngModelChange)="updateConfig('horasPorMes', $event)"
+            placeholder="160"
+            class="custom-input"
+          ></ion-input>
+          <p class="text-xs text-gray-500 mt-1 ml-1">{{ 'TAB1.HOURS_HELPER' | translate }}</p>
+        </div>
+      </div>
+    </div>
 
-    </ion-card-content>
-  </ion-card>
+    <!-- Appearance Card -->
+    <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm p-6">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        {{ 'TAB1.APPEARANCE_TITLE' | translate }}
+      </h2>
+      <div class="grid grid-cols-3 gap-2 bg-gray-100 dark:bg-black p-1 rounded-xl">
+        <button 
+          class="flex flex-col items-center justify-center py-3 rounded-lg transition-all duration-200"
+          [class.bg-white]="currentTheme() === 'light'"
+          [class.shadow-sm]="currentTheme() === 'light'"
+          [class.text-blue-600]="currentTheme() === 'light'"
+          [class.text-gray-500]="currentTheme() !== 'light'"
+          [class.dark:bg-zinc-700]="currentTheme() === 'light'"
+          [class.dark:text-white]="currentTheme() === 'light'"
+          (click)="setTheme('light')">
+          <ion-icon name="sunny" class="text-2xl mb-1"></ion-icon>
+          <span class="text-xs font-medium">{{ 'TAB1.THEME_LIGHT' | translate }}</span>
+        </button>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>{{ 'TAB1.APPEARANCE_TITLE' | translate }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-segment [value]="currentTheme" (ionChange)="changeTheme($event)">
-        <ion-segment-button value="light">
-          <ion-icon name="sunny"></ion-icon>
-          <ion-label>{{ 'TAB1.THEME_LIGHT' | translate }}</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="dark">
-          <ion-icon name="moon"></ion-icon>
-          <ion-label>{{ 'TAB1.THEME_DARK' | translate }}</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="system">
-          <ion-icon name="phone-portrait"></ion-icon>
-          <ion-label>{{ 'TAB1.THEME_SYSTEM' | translate }}</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-    </ion-card-content>
-  </ion-card>
+        <button 
+          class="flex flex-col items-center justify-center py-3 rounded-lg transition-all duration-200"
+          [class.bg-white]="currentTheme() === 'dark'"
+          [class.shadow-sm]="currentTheme() === 'dark'"
+          [class.text-blue-600]="currentTheme() === 'dark'"
+          [class.text-gray-500]="currentTheme() !== 'dark'"
+          [class.dark:bg-zinc-700]="currentTheme() === 'dark'"
+          [class.dark:text-white]="currentTheme() === 'dark'"
+          (click)="setTheme('dark')">
+          <ion-icon name="moon" class="text-2xl mb-1"></ion-icon>
+          <span class="text-xs font-medium">{{ 'TAB1.THEME_DARK' | translate }}</span>
+        </button>
 
-  <ion-card color="primary">
-    <ion-card-header>
-      <ion-card-title>{{ 'TAB1.HOURLY_RATE_TITLE' | translate }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <h1 style="font-size: 3em; font-weight: bold; text-align: center;">
-        {{ config.valorHoraCalculado | currency:'BRL' }}
+        <button 
+          class="flex flex-col items-center justify-center py-3 rounded-lg transition-all duration-200"
+          [class.bg-white]="currentTheme() === 'system'"
+          [class.shadow-sm]="currentTheme() === 'system'"
+          [class.text-blue-600]="currentTheme() === 'system'"
+          [class.text-gray-500]="currentTheme() !== 'system'"
+          [class.dark:bg-zinc-700]="currentTheme() === 'system'"
+          [class.dark:text-white]="currentTheme() === 'system'"
+          (click)="setTheme('system')">
+          <ion-icon name="phone-portrait" class="text-2xl mb-1"></ion-icon>
+          <span class="text-xs font-medium">{{ 'TAB1.THEME_SYSTEM' | translate }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="bg-blue-600 dark:bg-blue-700 rounded-2xl shadow-lg p-8 text-center text-white">
+      <h2 class="text-lg font-medium opacity-90 mb-2">
+        {{ 'TAB1.HOURLY_RATE_TITLE' | translate }}
+      </h2>
+      <h1 class="text-5xl font-extrabold mb-4 tracking-tight">
+        {{ config().valorHoraCalculado | currency:'BRL' }}
       </h1>
-      <p style="text-align: center;">{{ 'TAB1.HOURLY_RATE_DESC' | translate }}</p>
-    </ion-card-content>
-  </ion-card>
+      <p class="text-sm opacity-80 max-w-xs mx-auto leading-relaxed">
+        {{ 'TAB1.HOURLY_RATE_DESC' | translate }}
+      </p>
+    </div>
 
-  <ion-button expand="block" (click)="saveConfig()" class="ion-margin-top">
-    {{ 'TAB1.SAVE_CONFIG' | translate }}
-  </ion-button>
+    <ion-button expand="block" (click)="saveConfig()" shape="round" class="h-12 text-lg font-medium shadow-md">
+      {{ 'TAB1.SAVE_CONFIG' | translate }}
+    </ion-button>
 
-  <div class="ion-padding ion-text-center" style="margin-top: 20px;">
-    <p style="font-size: 0.9em;">
-      <a [routerLink]="['/privacy']" style="text-decoration: none; margin-right: 15px;">
-        <ion-icon name="shield-checkmark" style="vertical-align: middle;"></ion-icon> {{ 'TAB1.PRIVACY' | translate }}
-      </a>
-      <a [routerLink]="['/terms']" style="text-decoration: none;">
-        <ion-icon name="document-text" style="vertical-align: middle;"></ion-icon> {{ 'TAB1.TERMS' | translate }}
-      </a>
-    </p>
+    <div class="text-center pb-8 pt-4">
+      <p class="text-sm text-gray-500 dark:text-gray-400 flex justify-center gap-6">
+        <a [routerLink]="['/privacy']" class="flex items-center gap-1 hover:text-blue-600 transition-colors no-underline text-inherit">
+          <ion-icon name="shield-checkmark"></ion-icon> {{ 'TAB1.PRIVACY' | translate }}
+        </a>
+        <a [routerLink]="['/terms']" class="flex items-center gap-1 hover:text-blue-600 transition-colors no-underline text-inherit">
+          <ion-icon name="document-text"></ion-icon> {{ 'TAB1.TERMS' | translate }}
+        </a>
+      </p>
+    </div>
   </div>
 
 </ion-content>

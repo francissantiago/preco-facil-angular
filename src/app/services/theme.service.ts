@@ -47,8 +47,10 @@ export class ThemeService {
 
     if (isDark) {
       html.classList.add('ion-palette-dark');
+      html.classList.add('dark');
     } else {
       html.classList.remove('ion-palette-dark');
+      html.classList.remove('dark');
     }
   }
 

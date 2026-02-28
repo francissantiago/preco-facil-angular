@@ -1,15 +1,16 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonTextarea, IonAccordionGroup, IonAccordion, IonNote, IonCardSubtitle, IonButtons, IonPopover } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonTextarea, IonAccordionGroup, IonAccordion, IonNote, IonCardSubtitle, IonButtons, IonPopover, IonListHeader } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
 import { ToastService } from '../services/toast.service';
 import { Material, Orcamento, ConfiguracaoBase } from '../models/interfaces';
 import { addIcons } from 'ionicons';
-import { logoWhatsapp, trash, calculator, shareSocial, globe } from 'ionicons/icons';
+import { logoWhatsapp, trash, calculator, shareSocial, globe, timeOutline, trendingUpOutline } from 'ionicons/icons';
 import { AdMobService } from '../services/admob.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 // Imports para gerar e partilhar o PDF
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -29,98 +30,105 @@ import { Share } from '@capacitor/share';
 })
 export class Tab3Page implements OnInit {
   @ViewChild('popover') popover: any;
-  orcamentos: Orcamento[] = [];
-  materiaisDisponiveis: Material[] = [];
-  config: ConfiguracaoBase | null = null;
+  
+  private dataService = inject(DataService);
+  private admobService = inject(AdMobService);
+  private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
 
-  novoOrcamento: {
+  // Signals for state
+  state = toSignal(this.dataService.state$, { initialValue: { configuracaoBase: { nome: '', metaMensal: null, custosFixos: null, horasPorMes: null, valorHoraCalculado: 0 }, materiais: [], orcamentos: [] } });
+  
+  orcamentos = computed(() => this.state()?.orcamentos || []);
+  materiaisDisponiveis = computed(() => this.state()?.materiais || []);
+  config = computed(() => this.state()?.configuracaoBase || null);
+
+  // Local mutable signal for the new budget form
+  novoOrcamento = signal<{
     titulo: string;
     horasEstimadas: number | null;
     materiaisSelecionados: string[]; // IDs
     margemLucroPercentual: number | null;
     precoFinal: number;
-  } = {
+  }>({
     titulo: '',
     horasEstimadas: null,
     materiaisSelecionados: [],
     margemLucroPercentual: 20,
     precoFinal: 0
-  };
+  });
 
-  custoMaoDeObra: number = 0;
-  custoMateriais: number = 0;
-  lucro: number = 0;
+  // Computed values for the calculation logic
+  custoMaoDeObra = computed(() => {
+    const config = this.config();
+    const orcamento = this.novoOrcamento();
+    if (!config || !config.valorHoraCalculado) return 0;
+    return (orcamento.horasEstimadas || 0) * config.valorHoraCalculado;
+  });
 
-  constructor(
-    private dataService: DataService,
-    private admobService: AdMobService,
-    private toastService: ToastService,
-    private translate: TranslateService
-  ) {
-    addIcons({ logoWhatsapp, trash, calculator, shareSocial, globe });
+  custoMateriais = computed(() => {
+    const orcamento = this.novoOrcamento();
+    const materiais = this.materiaisDisponiveis();
+    if (!orcamento.materiaisSelecionados || orcamento.materiaisSelecionados.length === 0) return 0;
+    
+    return orcamento.materiaisSelecionados.reduce((total, id) => {
+      const mat = materiais.find(m => m.id === id);
+      return total + (mat ? mat.custo : 0);
+    }, 0);
+  });
+
+  lucro = computed(() => {
+    const subtotal = this.custoMaoDeObra() + this.custoMateriais();
+    const margem = this.novoOrcamento().margemLucroPercentual || 0;
+    return subtotal * (margem / 100);
+  });
+
+  precoFinal = computed(() => {
+    return this.custoMaoDeObra() + this.custoMateriais() + this.lucro();
+  });
+
+  constructor() {
+    addIcons({ logoWhatsapp, trash, calculator, shareSocial, globe, timeOutline, trendingUpOutline });
   }
 
   ngOnInit() {
-    this.dataService.state$.subscribe(state => {
-      this.orcamentos = state.orcamentos;
-      this.materiaisDisponiveis = state.materiais;
-      this.config = state.configuracaoBase;
-    });
+    // No subscription needed
   }
 
-  calcular() {
-    if (!this.config) return;
-
-    // 1. Custo Mão de Obra
-    this.custoMaoDeObra = (this.novoOrcamento.horasEstimadas || 0) * (this.config.valorHoraCalculado || 0);
-
-    // 2. Custo Materiais
-    this.custoMateriais = 0;
-    if (this.novoOrcamento.materiaisSelecionados && this.novoOrcamento.materiaisSelecionados.length > 0) {
-      this.novoOrcamento.materiaisSelecionados.forEach(id => {
-        const material = this.materiaisDisponiveis.find(m => m.id === id);
-        if (material) {
-          this.custoMateriais += material.custo;
-        }
-      });
-    }
-
-    // 3. Subtotal e Lucro (Markup)
-    const subtotal = this.custoMaoDeObra + this.custoMateriais;
-    this.lucro = subtotal * ((this.novoOrcamento.margemLucroPercentual || 0) / 100);
-
-    // 4. Preço Final
-    this.novoOrcamento.precoFinal = subtotal + this.lucro;
+  updateNovoOrcamento(field: string, value: any) {
+    this.novoOrcamento.update(s => ({ ...s, [field]: value }));
   }
 
   salvarOrcamento() {
-    this.calcular(); // Garantir atualizado
-    if (!this.novoOrcamento.titulo) {
+    const orcamentoAtual = this.novoOrcamento();
+    
+    if (!orcamentoAtual.titulo) {
       this.translate.get('TAB3.TOAST_TITLE_WARNING').subscribe((res: string) => {
         this.toastService.presentToast(res, 'warning');
       });
       return;
     }
 
+    // Use computed price for saving
+    const finalPrice = this.precoFinal();
+
     this.dataService.addOrcamento({
-      titulo: this.novoOrcamento.titulo,
-      horasEstimadas: this.novoOrcamento.horasEstimadas || 0,
-      materiaisUsados: this.novoOrcamento.materiaisSelecionados,
-      margemLucroPercentual: this.novoOrcamento.margemLucroPercentual || 0,
-      precoFinal: this.novoOrcamento.precoFinal
+      titulo: orcamentoAtual.titulo,
+      horasEstimadas: orcamentoAtual.horasEstimadas || 0,
+      materiaisUsados: orcamentoAtual.materiaisSelecionados,
+      margemLucroPercentual: orcamentoAtual.margemLucroPercentual || 0,
+      precoFinal: finalPrice
     });
 
     // Reset form
-    this.novoOrcamento = {
+    this.novoOrcamento.set({
       titulo: '',
       horasEstimadas: null,
       materiaisSelecionados: [],
       margemLucroPercentual: 20,
       precoFinal: 0
-    };
-    this.custoMaoDeObra = 0;
-    this.custoMateriais = 0;
-    this.lucro = 0;
+    });
+    
     this.translate.get('TAB3.TOAST_SAVED').subscribe((res: string) => {
       this.toastService.presentToast(res, 'success');
     });
@@ -133,6 +141,12 @@ export class Tab3Page implements OnInit {
     });
   }
 
+  changeLanguage(event: any) {
+    if (event.detail && event.detail.value) {
+      this.translate.use(event.detail.value);
+    }
+  }
+
   acaoComAnuncio(tipo: 'whatsapp' | 'pdf', orcamento: Orcamento) {
     // Chama o serviço de anúncio passando a função que deve ser executada após o vídeo
     this.admobService.showRewardedAd(() => {
@@ -142,12 +156,6 @@ export class Tab3Page implements OnInit {
         this.gerarPDF(orcamento);
       }
     });
-  }
-
-  changeLanguage(event: any) {
-    if (event.detail && event.detail.value) {
-      this.translate.use(event.detail.value);
-    }
   }
 
   async compartilharWhatsApp(orcamento: Orcamento) {
@@ -162,7 +170,7 @@ export class Tab3Page implements OnInit {
     if (orcamento.materiaisUsados.length > 0) {
       texto += `${translations.MATERIALS_COSTS}:\n`;
       orcamento.materiaisUsados.forEach(id => {
-        const mat = this.materiaisDisponiveis.find(m => m.id === id);
+        const mat = this.materiaisDisponiveis().find(m => m.id === id); // Use signal
         if (mat) texto += `- ${mat.nome}\n`;
       });
     }
@@ -185,7 +193,7 @@ export class Tab3Page implements OnInit {
       linhasMateriais.push([{ text: t.MATERIALS_HEADER, bold: true }, { text: t.VALUE_HEADER, bold: true }]);
       
       orcamento.materiaisUsados.forEach(id => {
-        const mat = this.materiaisDisponiveis.find(m => m.id === id);
+        const mat = this.materiaisDisponiveis().find(m => m.id === id); // Use signal
         if (mat) {
           linhasMateriais.push([
             mat.nome, 
@@ -198,7 +206,7 @@ export class Tab3Page implements OnInit {
     }
 
     // 2. Desenhar a estrutura do documento
-    const nomeEmpresa = this.config?.nome || t.DEFAULT_TITLE;
+    const nomeEmpresa = this.config()?.nome || t.DEFAULT_TITLE; // Use signal
     
     const docDefinition: any = {
       content: [

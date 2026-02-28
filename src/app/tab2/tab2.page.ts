@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonListHeader, IonButtons, IonPopover } from '@ionic/angular/standalone';
@@ -8,6 +8,7 @@ import { Material } from '../models/interfaces';
 import { addIcons } from 'ionicons';
 import { trash, add, globe } from 'ionicons/icons';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-tab2',
@@ -18,30 +19,34 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class Tab2Page implements OnInit {
   @ViewChild('popover') popover: any;
-  materiais: Material[] = [];
-  novoMaterial: { nome: string; custo: number | null } = { nome: '', custo: null };
+  
+  private dataService = inject(DataService);
+  private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
 
-  constructor(
-    private dataService: DataService,
-    private toastService: ToastService,
-    private translate: TranslateService
-  ) {
+  // Signals
+  state = toSignal(this.dataService.state$, { initialValue: { configuracaoBase: { nome: '', metaMensal: null, custosFixos: null, horasPorMes: null, valorHoraCalculado: 0 }, materiais: [], orcamentos: [] } });
+  
+  materiais = computed(() => this.state()?.materiais || []);
+  
+  novoMaterial = signal<{ nome: string; custo: number | null }>({ nome: '', custo: null });
+
+  constructor() {
     addIcons({ trash, add, globe });
   }
 
   ngOnInit() {
-    this.dataService.state$.subscribe(state => {
-      this.materiais = state.materiais;
-    });
+    // No subscription needed
   }
 
   adicionarMaterial() {
-    if (this.novoMaterial.nome && this.novoMaterial.custo !== null) {
+    const material = this.novoMaterial();
+    if (material.nome && material.custo !== null) {
       this.dataService.addMaterial({
-        nome: this.novoMaterial.nome,
-        custo: Number(this.novoMaterial.custo)
+        nome: material.nome,
+        custo: Number(material.custo)
       });
-      this.novoMaterial = { nome: '', custo: null };
+      this.novoMaterial.set({ nome: '', custo: null });
       this.translate.get('TAB2.TOAST_ADDED').subscribe((res: string) => {
         this.toastService.presentToast(res, 'success');
       });
@@ -57,6 +62,10 @@ export class Tab2Page implements OnInit {
     this.translate.get('TAB2.TOAST_REMOVED').subscribe((res: string) => {
       this.toastService.presentToast(res, 'primary');
     });
+  }
+
+  updateNovoMaterial(field: string, value: any) {
+    this.novoMaterial.update(m => ({ ...m, [field]: value }));
   }
 
   changeLanguage(event: any) {

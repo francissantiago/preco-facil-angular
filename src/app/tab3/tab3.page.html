@@ -1,22 +1,24 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>{{ 'TAB3.TITLE' | translate }}</ion-title>
+<ion-header [translucent]="true" class="no-border">
+  <ion-toolbar class="bg-white dark:bg-gray-900">
+    <ion-title class="text-xl font-bold text-gray-900 dark:text-white">
+      {{ 'TAB3.TITLE' | translate }}
+    </ion-title>
     <ion-buttons slot="end">
-      <ion-button id="language-trigger-tab3">
+      <ion-button id="language-trigger-tab3" class="text-blue-600 dark:text-blue-400">
         <ion-icon slot="icon-only" name="globe"></ion-icon>
       </ion-button>
-      <ion-popover trigger="language-trigger-tab3" triggerAction="click" #popover>
+      <ion-popover trigger="language-trigger-tab3" triggerAction="click" #popover class="rounded-xl">
         <ng-template>
-          <ion-content>
-            <ion-list>
-              <ion-item button (click)="changeLanguage({detail: {value: 'pt-BR'}}); popover.dismiss()" detail="false">
-                <ion-label>Português</ion-label>
+          <ion-content class="ion-no-padding">
+            <ion-list lines="none" class="py-2">
+              <ion-item button (click)="changeLanguage({detail: {value: 'pt-BR'}}); popover.dismiss()" detail="false" class="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <ion-label class="font-medium">Português</ion-label>
               </ion-item>
-              <ion-item button (click)="changeLanguage({detail: {value: 'en'}}); popover.dismiss()" detail="false">
-                <ion-label>English</ion-label>
+              <ion-item button (click)="changeLanguage({detail: {value: 'en'}}); popover.dismiss()" detail="false" class="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <ion-label class="font-medium">English</ion-label>
               </ion-item>
-              <ion-item button (click)="changeLanguage({detail: {value: 'es'}}); popover.dismiss()" detail="false">
-                <ion-label>Español</ion-label>
+              <ion-item button (click)="changeLanguage({detail: {value: 'es'}}); popover.dismiss()" detail="false" class="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <ion-label class="font-medium">Español</ion-label>
               </ion-item>
             </ion-list>
           </ion-content>
@@ -26,102 +28,188 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="bg-gray-50 dark:bg-black">
   <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">{{ 'TAB3.TITLE' | translate }}</ion-title>
+    <ion-toolbar class="bg-gray-50 dark:bg-black">
+      <ion-title size="large" class="text-3xl font-bold text-gray-900 dark:text-white">
+        {{ 'TAB3.TITLE' | translate }}
+      </ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ion-accordion-group>
-    <ion-accordion value="new">
-      <ion-item slot="header" color="light">
-        <ion-label>{{ 'TAB3.NEW_BUDGET_TITLE' | translate }}</ion-label>
-        <ion-icon name="calculator" slot="start"></ion-icon>
-      </ion-item>
-      <div class="ion-padding" slot="content">
+  <div class="px-4 pb-20 pt-4 space-y-6">
+    
+    <!-- Novo Orçamento Section -->
+    <ion-accordion-group class="rounded-2xl shadow-sm bg-white dark:bg-gray-900 overflow-hidden">
+      <ion-accordion value="new">
+        <ion-item slot="header" color="light" lines="none" class="bg-white dark:bg-gray-900">
+          <ion-icon name="calculator" slot="start" class="text-blue-600 dark:text-blue-400"></ion-icon>
+          <ion-label class="font-bold text-gray-800 dark:text-gray-100">{{ 'TAB3.NEW_BUDGET_TITLE' | translate }}</ion-label>
+        </ion-item>
         
-        <ion-item>
-          <ion-input [label]="'TAB3.PROJECT_TITLE_LABEL' | translate" labelPlacement="stacked" [(ngModel)]="novoOrcamento.titulo" [placeholder]="'TAB3.PROJECT_TITLE_PLACEHOLDER' | translate"></ion-input>
-        </ion-item>
+        <div class="p-4 space-y-4 bg-white dark:bg-gray-900" slot="content">
+          
+          <div class="space-y-1">
+            <ion-input
+              mode="md"
+              label-placement="stacked"
+              fill="outline"
+              [label]="'TAB3.PROJECT_TITLE_LABEL' | translate"
+              [placeholder]="'TAB3.PROJECT_TITLE_PLACEHOLDER' | translate"
+              [ngModel]="novoOrcamento().titulo"
+              (ngModelChange)="updateNovoOrcamento('titulo', $event)"
+              class="custom-input"
+            ></ion-input>
+          </div>
 
-        <ion-item>
-          <ion-input [label]="'TAB3.ESTIMATED_HOURS_LABEL' | translate" labelPlacement="stacked" type="number" [(ngModel)]="novoOrcamento.horasEstimadas" (ionInput)="calcular()" placeholder="0"></ion-input>
-          <ion-note slot="end" *ngIf="config?.valorHoraCalculado">
-            x {{ config?.valorHoraCalculado | currency:'BRL' }}/h
-          </ion-note>
-        </ion-item>
+          <div class="space-y-1 relative">
+            <ion-input
+              mode="md"
+              label-placement="stacked"
+              fill="outline"
+              type="number"
+              [label]="'TAB3.ESTIMATED_HOURS_LABEL' | translate"
+              placeholder="0"
+              [ngModel]="novoOrcamento().horasEstimadas"
+              (ngModelChange)="updateNovoOrcamento('horasEstimadas', $event)"
+              class="custom-input"
+            ></ion-input>
+            @if (config()?.valorHoraCalculado) {
+              <div class="absolute right-3 top-9 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 px-1">
+                x {{ config()?.valorHoraCalculado | currency:'BRL' }}/h
+              </div>
+            }
+          </div>
 
-        <ion-item>
-          <ion-select [label]="'TAB3.MATERIALS_LABEL' | translate" labelPlacement="stacked" [multiple]="true" [(ngModel)]="novoOrcamento.materiaisSelecionados" (ionChange)="calcular()" [placeholder]="'TAB3.MATERIALS_PLACEHOLDER' | translate">
-            <ion-select-option *ngFor="let mat of materiaisDisponiveis" [value]="mat.id">
-              {{ mat.nome }} ({{ mat.custo | currency:'BRL' }})
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
+          <div class="space-y-1">
+            <ion-select
+              mode="md"
+              label-placement="stacked"
+              fill="outline"
+              [label]="'TAB3.MATERIALS_LABEL' | translate"
+              [placeholder]="'TAB3.MATERIALS_PLACEHOLDER' | translate"
+              [multiple]="true"
+              [ngModel]="novoOrcamento().materiaisSelecionados"
+              (ngModelChange)="updateNovoOrcamento('materiaisSelecionados', $event)"
+              class="custom-input"
+            >
+              @for (mat of materiaisDisponiveis(); track mat.id) {
+                <ion-select-option [value]="mat.id">
+                  {{ mat.nome }} ({{ mat.custo | currency:'BRL' }})
+                </ion-select-option>
+              }
+            </ion-select>
+          </div>
 
-        <ion-item>
-          <ion-input [label]="'TAB3.PROFIT_MARGIN_LABEL' | translate" labelPlacement="stacked" type="number" [(ngModel)]="novoOrcamento.margemLucroPercentual" (ionInput)="calcular()" placeholder="20"></ion-input>
-        </ion-item>
+          <div class="space-y-1">
+            <ion-input
+              mode="md"
+              label-placement="stacked"
+              fill="outline"
+              type="number"
+              [label]="'TAB3.PROFIT_MARGIN_LABEL' | translate"
+              placeholder="20"
+              [ngModel]="novoOrcamento().margemLucroPercentual"
+              (ngModelChange)="updateNovoOrcamento('margemLucroPercentual', $event)"
+              class="custom-input"
+            ></ion-input>
+          </div>
 
-        <ion-card color="light" class="ion-margin-top">
-          <ion-card-content>
-            <p>{{ 'TAB3.LABOR_COST' | translate }}: {{ custoMaoDeObra | currency:'BRL' }}</p>
-            <p>{{ 'TAB3.MATERIALS_COST' | translate }}: {{ custoMateriais | currency:'BRL' }}</p>
-            <p>{{ 'TAB3.ESTIMATED_PROFIT' | translate }}: {{ lucro | currency:'BRL' }}</p>
-            <h2 class="ion-text-center ion-margin-top" style="font-weight: bold; font-size: 1.5em;">
-              {{ 'TAB3.TOTAL_LABEL' | translate }}: {{ novoOrcamento.precoFinal | currency:'BRL' }}
-            </h2>
-          </ion-card-content>
-        </ion-card>
+          <div class="mt-6 bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+              <div class="flex justify-between">
+                <span>{{ 'TAB3.LABOR_COST' | translate }}:</span>
+                <span class="font-medium">{{ custoMaoDeObra() | currency:'BRL' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>{{ 'TAB3.MATERIALS_COST' | translate }}:</span>
+                <span class="font-medium">{{ custoMateriais() | currency:'BRL' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>{{ 'TAB3.ESTIMATED_PROFIT' | translate }}:</span>
+                <span class="font-medium">{{ lucro() | currency:'BRL' }}</span>
+              </div>
+              <div class="pt-3 mt-2 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
+                <span class="font-bold text-gray-900 dark:text-white text-lg">{{ 'TAB3.TOTAL_LABEL' | translate }}:</span>
+                <span class="font-bold text-blue-600 dark:text-blue-400 text-xl">{{ precoFinal() | currency:'BRL' }}</span>
+              </div>
+            </div>
+          </div>
 
-        <ion-button expand="block" (click)="salvarOrcamento()" [disabled]="!novoOrcamento.titulo">
-          {{ 'TAB3.SAVE_BUTTON' | translate }}
-        </ion-button>
+          <ion-button 
+            expand="block" 
+            class="mt-4 font-bold" 
+            shape="round"
+            (click)="salvarOrcamento()" 
+            [disabled]="!novoOrcamento().titulo">
+            {{ 'TAB3.SAVE_BUTTON' | translate }}
+          </ion-button>
 
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+
+    <!-- Histórico Section -->
+    <div>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 px-1">{{ 'TAB3.HISTORY_TITLE' | translate }}</h3>
+
+      @if (orcamentos().length === 0) {
+        <div class="flex flex-col items-center justify-center py-10 text-gray-400">
+          <ion-icon name="calculator" class="text-6xl mb-4 opacity-20"></ion-icon>
+          <p>{{ 'TAB3.EMPTY_HISTORY' | translate }}</p>
+        </div>
+      }
+
+      <div class="space-y-4">
+        @for (orcamento of orcamentos(); track orcamento.id) {
+          <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <h4 class="font-bold text-lg text-gray-900 dark:text-white">{{ orcamento.titulo }}</h4>
+                <p class="text-xs text-gray-500">{{ orcamento.dataCriacao | date:'short' }}</p>
+              </div>
+              <div class="text-right">
+                <span class="block font-bold text-blue-600 dark:text-blue-400 text-lg">
+                  {{ orcamento.precoFinal | currency:'BRL' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="flex gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <span class="flex items-center gap-1">
+                <ion-icon name="time-outline"></ion-icon>
+                {{ orcamento.horasEstimadas }}h
+              </span>
+              <span class="flex items-center gap-1">
+                <ion-icon name="trending-up-outline"></ion-icon>
+                {{ orcamento.margemLucroPercentual }}%
+              </span>
+            </div>
+            
+            <div class="grid grid-cols-5 gap-2">
+              <button 
+                (click)="acaoComAnuncio('whatsapp', orcamento)"
+                class="col-span-2 flex items-center justify-center gap-2 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400 font-medium py-2 rounded-lg active:opacity-80 transition-opacity">
+                <ion-icon name="logo-whatsapp"></ion-icon>
+                WhatsApp
+              </button>
+              
+              <button 
+                (click)="acaoComAnuncio('pdf', orcamento)"
+                class="col-span-2 flex items-center justify-center gap-2 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 font-medium py-2 rounded-lg active:opacity-80 transition-opacity">
+                <ion-icon name="document-text"></ion-icon>
+                PDF
+              </button>
+
+              <button 
+                (click)="removerOrcamento(orcamento.id)"
+                class="col-span-1 flex items-center justify-center bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 rounded-lg active:opacity-80 transition-opacity">
+                <ion-icon name="trash" class="text-xl"></ion-icon>
+              </button>
+            </div>
+          </div>
+        }
       </div>
-    </ion-accordion>
-  </ion-accordion-group>
-
-  <h3 class="ion-margin-top">{{ 'TAB3.HISTORY_TITLE' | translate }}</h3>
-
-  <div *ngIf="orcamentos.length === 0" class="ion-text-center ion-padding">
-    <p color="medium">{{ 'TAB3.EMPTY_HISTORY' | translate }}</p>
+    </div>
   </div>
-
-  <ion-card *ngFor="let orcamento of orcamentos">
-    <ion-card-header>
-      <ion-card-title>{{ orcamento.titulo }}</ion-card-title>
-      <ion-card-subtitle>{{ orcamento.dataCriacao | date:'short' }}</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <p><strong>{{ 'TAB3.FINAL_PRICE' | translate }}: {{ orcamento.precoFinal | currency:'BRL' }}</strong></p>
-      <p>{{ 'TAB3.HOURS' | translate }}: {{ orcamento.horasEstimadas }}h</p>
-      <p>{{ 'TAB3.MARGIN' | translate }}: {{ orcamento.margemLucroPercentual }}%</p>
-      
-      <div class="ion-margin-top" style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <ion-button fill="outline" color="success" expand="block" style="flex: 1; min-width: 110px;" (click)="acaoComAnuncio('whatsapp', orcamento)">
-          <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
-          {{ 'TAB3.WHATSAPP_BUTTON' | translate }}
-        </ion-button>
-        
-        <ion-button fill="outline" color="tertiary" expand="block" style="flex: 1; min-width: 110px;" (click)="acaoComAnuncio('pdf', orcamento)">
-          <ion-icon name="document-text" slot="start"></ion-icon>
-          {{ 'TAB3.PDF_BUTTON' | translate }}
-        </ion-button>
-
-        <ion-button fill="outline" color="danger" (click)="removerOrcamento(orcamento.id)">
-          <ion-icon name="trash" slot="icon-only"></ion-icon>
-        </ion-button>
-      </div>
-    </ion-card-content>
-  </ion-card>
-  
-  <!-- <div class="ion-padding ion-text-center ion-margin-top">
-      <p style="font-size: 0.8em; color: gray;">
-        {{ 'TAB3.SUPPORT_DEV' | translate }}: 
-        <a href="#" style="text-decoration: none; font-weight: bold;">{{ 'TAB3.BUY_COFFEE' | translate }}</a>
-      </p>
-  </div> -->
-
 </ion-content>

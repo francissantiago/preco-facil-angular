@@ -26,62 +26,91 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding bg-gray-50 dark:bg-zinc-900">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">{{ 'TAB2.TITLE' | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <!-- Add Material Form -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>{{ 'TAB2.NEW_MATERIAL_TITLE' | translate }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-input [label]="'TAB2.NAME_LABEL' | translate" labelPlacement="stacked" [(ngModel)]="novoMaterial.nome" [placeholder]="'TAB2.NAME_PLACEHOLDER' | translate"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-input [label]="'TAB2.COST_LABEL' | translate" labelPlacement="stacked" type="number" [(ngModel)]="novoMaterial.custo" placeholder="0.00"></ion-input>
-      </ion-item>
-      <ion-button expand="block" (click)="adicionarMaterial()" [disabled]="!novoMaterial.nome || novoMaterial.custo === null" class="ion-margin-top">
-        <ion-icon name="add" slot="start"></ion-icon>
-        {{ 'TAB2.ADD_BUTTON' | translate }}
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+  <div class="space-y-6 max-w-md mx-auto">
+    <!-- Add Material Form -->
+    <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm p-6">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        {{ 'TAB2.NEW_MATERIAL_TITLE' | translate }}
+      </h2>
+      <div class="space-y-4">
+        <ion-input
+          [label]="'TAB2.NAME_LABEL' | translate"
+          labelPlacement="stacked"
+          fill="outline"
+          shape="round"
+          [ngModel]="novoMaterial().nome"
+          (ngModelChange)="updateNovoMaterial('nome', $event)"
+          [placeholder]="'TAB2.NAME_PLACEHOLDER' | translate"
+          class="custom-input"
+        ></ion-input>
+        
+        <ion-input
+          [label]="'TAB2.COST_LABEL' | translate"
+          labelPlacement="stacked"
+          fill="outline"
+          shape="round"
+          type="number"
+          [ngModel]="novoMaterial().custo"
+          (ngModelChange)="updateNovoMaterial('custo', $event)"
+          placeholder="0.00"
+          class="custom-input"
+        ></ion-input>
 
-  <!-- List of Materials -->
-  <ion-list lines="full">
-    <ion-list-header>
-      <ion-label>{{ 'TAB2.LIST_HEADER' | translate }}</ion-label>
-    </ion-list-header>
-
-    <ion-item-sliding *ngFor="let material of materiais">
-      <ion-item>
-        <ion-label>
-          <h2>{{ material.nome }}</h2>
-          <p>{{ material.custo | currency:'BRL' }}</p>
-        </ion-label>
-        <ion-button fill="clear" color="danger" slot="end" (click)="removerMaterial(material.id)">
-          <ion-icon name="trash" slot="icon-only"></ion-icon>
+        <ion-button 
+          expand="block" 
+          (click)="adicionarMaterial()" 
+          [disabled]="!novoMaterial().nome || novoMaterial().custo === null" 
+          shape="round" 
+          class="h-12 text-lg font-medium shadow-md mt-4"
+        >
+          <ion-icon name="add" slot="start"></ion-icon>
+          {{ 'TAB2.ADD_BUTTON' | translate }}
         </ion-button>
-      </ion-item>
-      
-      <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="removerMaterial(material.id)">
-          <ion-icon name="trash" slot="start"></ion-icon>
-          {{ 'TAB2.DELETE_BUTTON' | translate }}
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-    
-    <ion-item *ngIf="materiais.length === 0">
-      <ion-label class="ion-text-center" color="medium">
-        <p>{{ 'TAB2.EMPTY_LIST' | translate }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+      </div>
+    </div>
+
+    <!-- List of Materials -->
+    <div class="bg-transparent">
+      <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 px-2">
+        {{ 'TAB2.LIST_HEADER' | translate }}
+      </h3>
+
+      <div class="space-y-3">
+        @for (material of materiais(); track material.id) {
+          <ion-item-sliding class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm overflow-hidden">
+            <ion-item lines="none" class="bg-transparent">
+              <ion-label>
+                <h2 class="font-bold text-gray-900 dark:text-white">{{ material.nome }}</h2>
+                <p class="text-green-600 dark:text-green-400 font-medium mt-1">
+                  {{ material.custo | currency:'BRL' }}
+                </p>
+              </ion-label>
+              <ion-button fill="clear" color="danger" slot="end" (click)="removerMaterial(material.id)">
+                <ion-icon name="trash" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-item>
+            
+            <ion-item-options side="end">
+              <ion-item-option color="danger" (click)="removerMaterial(material.id)">
+                <ion-icon name="trash" slot="start"></ion-icon>
+                {{ 'TAB2.DELETE_BUTTON' | translate }}
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        } @empty {
+          <div class="text-center py-10 opacity-60">
+            <p>{{ 'TAB2.EMPTY_LIST' | translate }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
 
 </ion-content>
