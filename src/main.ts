@@ -3,7 +3,7 @@ import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } 
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { Observable } from 'rxjs';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
@@ -14,8 +14,17 @@ import { LOCALE_ID, importProvidersFrom } from '@angular/core';
 
 registerLocaleData(localePt);
 
+// Custom Loader para evitar problemas de compatibilidade com TranslateHttpLoader
+export class CustomTranslateLoader implements TranslateLoader {
+  constructor(private http: HttpClient) {}
+
+  getTranslation(lang: string): Observable<any> {
+    return this.http.get(`./assets/i18n/${lang}.json`);
+  }
+}
+
 export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http);
+  return new CustomTranslateLoader(http);
 }
 
 bootstrapApplication(AppComponent, {

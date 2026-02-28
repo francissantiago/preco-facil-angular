@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonListHeader } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonListHeader, IonButtons, IonPopover } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
 import { ToastService } from '../services/toast.service';
 import { Material } from '../models/interfaces';
 import { addIcons } from 'ionicons';
-import { trash, add } from 'ionicons/icons';
+import { trash, add, globe } from 'ionicons/icons';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -14,9 +14,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonListHeader, IonCardContent, IonCardTitle, IonCardHeader, IonCard, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, TranslateModule]
+  imports: [IonListHeader, IonCardContent, IonCardTitle, IonCardHeader, IonCard, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, IonButtons, IonPopover, TranslateModule]
 })
 export class Tab2Page implements OnInit {
+  @ViewChild('popover') popover: any;
   materiais: Material[] = [];
   novoMaterial: { nome: string; custo: number | null } = { nome: '', custo: null };
 
@@ -25,7 +26,7 @@ export class Tab2Page implements OnInit {
     private toastService: ToastService,
     private translate: TranslateService
   ) {
-    addIcons({ trash, add });
+    addIcons({ trash, add, globe });
   }
 
   ngOnInit() {
@@ -56,5 +57,11 @@ export class Tab2Page implements OnInit {
     this.translate.get('TAB2.TOAST_REMOVED').subscribe((res: string) => {
       this.toastService.presentToast(res, 'primary');
     });
+  }
+
+  changeLanguage(event: any) {
+    if (event.detail && event.detail.value) {
+      this.translate.use(event.detail.value);
+    }
   }
 }

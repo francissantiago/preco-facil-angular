@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonNote, IonButton, IonSegment, IonSegmentButton, IonIcon } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonNote, IonButton, IonSegment, IonSegmentButton, IonIcon, IonButtons, IonPopover, IonList } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
 import { ThemeService, Theme } from '../services/theme.service';
 import { ToastService } from '../services/toast.service';
 import { ConfiguracaoBase } from '../models/interfaces';
 import { addIcons } from 'ionicons';
-import { moon, sunny, settings, phonePortrait, documentText, shieldCheckmark } from 'ionicons/icons';
+import { moon, sunny, settings, phonePortrait, documentText, shieldCheckmark, globe } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -16,9 +16,11 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonNote, IonButton, IonSegment, IonSegmentButton, IonIcon, RouterLink, TranslateModule],
+  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonNote, IonButton, IonSegment, IonSegmentButton, IonIcon, IonButtons, IonPopover, IonList, RouterLink, TranslateModule],
 })
 export class Tab1Page implements OnInit {
+  @ViewChild('popover') popover: any;
+  
   config: ConfiguracaoBase = {
     nome: '',
     metaMensal: null,
@@ -34,7 +36,7 @@ export class Tab1Page implements OnInit {
     private toastService: ToastService,
     private translate: TranslateService
   ) {
-    addIcons({ moon, sunny, settings, phonePortrait, documentText, shieldCheckmark });
+    addIcons({ moon, sunny, settings, phonePortrait, documentText, shieldCheckmark, globe });
   }
 
   ngOnInit() {
@@ -60,6 +62,12 @@ export class Tab1Page implements OnInit {
       this.config.valorHoraCalculado = totalNecessario / horas;
     } else {
       this.config.valorHoraCalculado = 0;
+    }
+  }
+
+  changeLanguage(event: any) {
+    if (event.detail && event.detail.value) {
+      this.translate.use(event.detail.value);
     }
   }
 

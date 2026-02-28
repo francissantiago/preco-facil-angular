@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonTextarea, IonAccordionGroup, IonAccordion, IonNote, IonCardSubtitle } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonTextarea, IonAccordionGroup, IonAccordion, IonNote, IonCardSubtitle, IonButtons, IonPopover } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
 import { ToastService } from '../services/toast.service';
 import { Material, Orcamento, ConfiguracaoBase } from '../models/interfaces';
 import { addIcons } from 'ionicons';
-import { logoWhatsapp, trash, calculator, shareSocial } from 'ionicons/icons';
+import { logoWhatsapp, trash, calculator, shareSocial, globe } from 'ionicons/icons';
 import { AdMobService } from '../services/admob.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
@@ -25,9 +25,10 @@ import { Share } from '@capacitor/share';
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, IonNote, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordionGroup, IonAccordion, TranslateModule]
+  imports: [IonCardSubtitle, IonNote, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordionGroup, IonAccordion, IonButtons, IonPopover, IonList, TranslateModule]
 })
 export class Tab3Page implements OnInit {
+  @ViewChild('popover') popover: any;
   orcamentos: Orcamento[] = [];
   materiaisDisponiveis: Material[] = [];
   config: ConfiguracaoBase | null = null;
@@ -56,7 +57,7 @@ export class Tab3Page implements OnInit {
     private toastService: ToastService,
     private translate: TranslateService
   ) {
-    addIcons({ logoWhatsapp, trash, calculator, shareSocial });
+    addIcons({ logoWhatsapp, trash, calculator, shareSocial, globe });
   }
 
   ngOnInit() {
@@ -141,6 +142,12 @@ export class Tab3Page implements OnInit {
         this.gerarPDF(orcamento);
       }
     });
+  }
+
+  changeLanguage(event: any) {
+    if (event.detail && event.detail.value) {
+      this.translate.use(event.detail.value);
+    }
   }
 
   async compartilharWhatsApp(orcamento: Orcamento) {
