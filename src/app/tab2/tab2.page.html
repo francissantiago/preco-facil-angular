@@ -1,31 +1,31 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Meus Custos</ion-title>
+    <ion-title>{{ 'TAB2.TITLE' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Meus Custos</ion-title>
+      <ion-title size="large">{{ 'TAB2.TITLE' | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <!-- Add Material Form -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Novo Custo/Material</ion-card-title>
+      <ion-card-title>{{ 'TAB2.NEW_MATERIAL_TITLE' | translate }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-item>
-        <ion-input label="Nome" labelPlacement="stacked" [(ngModel)]="novoMaterial.nome" placeholder="Ex: Hospedagem, Resina"></ion-input>
+        <ion-input [label]="'TAB2.NAME_LABEL' | translate" labelPlacement="stacked" [(ngModel)]="novoMaterial.nome" [placeholder]="'TAB2.NAME_PLACEHOLDER' | translate"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-input label="Valor Unitário (R$)" labelPlacement="stacked" type="number" [(ngModel)]="novoMaterial.custo" placeholder="0.00"></ion-input>
+        <ion-input [label]="'TAB2.COST_LABEL' | translate" labelPlacement="stacked" type="number" [(ngModel)]="novoMaterial.custo" placeholder="0.00"></ion-input>
       </ion-item>
       <ion-button expand="block" (click)="adicionarMaterial()" [disabled]="!novoMaterial.nome || novoMaterial.custo === null" class="ion-margin-top">
         <ion-icon name="add" slot="start"></ion-icon>
-        Adicionar
+        {{ 'TAB2.ADD_BUTTON' | translate }}
       </ion-button>
     </ion-card-content>
   </ion-card>
@@ -33,7 +33,7 @@
   <!-- List of Materials -->
   <ion-list lines="full">
     <ion-list-header>
-      <ion-label>Itens Cadastrados</ion-label>
+      <ion-label>{{ 'TAB2.LIST_HEADER' | translate }}</ion-label>
     </ion-list-header>
 
     <ion-item-sliding *ngFor="let material of materiais">
@@ -50,14 +50,14 @@
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="removerMaterial(material.id)">
           <ion-icon name="trash" slot="start"></ion-icon>
-          Excluir
+          {{ 'TAB2.DELETE_BUTTON' | translate }}
         </ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
     
     <ion-item *ngIf="materiais.length === 0">
       <ion-label class="ion-text-center" color="medium">
-        <p>Nenhum custo cadastrado.</p>
+        <p>{{ 'TAB2.EMPTY_LIST' | translate }}</p>
       </ion-label>
     </ion-item>
   </ion-list>

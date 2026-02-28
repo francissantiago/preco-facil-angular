@@ -8,6 +8,8 @@ import { Material, Orcamento, ConfiguracaoBase } from '../models/interfaces';
 import { addIcons } from 'ionicons';
 import { logoWhatsapp, trash, calculator, shareSocial } from 'ionicons/icons';
 import { AdMobService } from '../services/admob.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
 // Imports para gerar e partilhar o PDF
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -23,7 +25,7 @@ import { Share } from '@capacitor/share';
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, IonNote, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordionGroup, IonAccordion]
+  imports: [IonCardSubtitle, IonNote, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordionGroup, IonAccordion, TranslateModule]
 })
 export class Tab3Page implements OnInit {
   orcamentos: Orcamento[] = [];
@@ -51,7 +53,8 @@ export class Tab3Page implements OnInit {
   constructor(
     private dataService: DataService,
     private admobService: AdMobService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private translate: TranslateService
   ) {
     addIcons({ logoWhatsapp, trash, calculator, shareSocial });
   }
@@ -92,7 +95,9 @@ export class Tab3Page implements OnInit {
   salvarOrcamento() {
     this.calcular(); // Garantir atualizado
     if (!this.novoOrcamento.titulo) {
-      this.toastService.presentToast('Preencha o título do orçamento.', 'warning');
+      this.translate.get('TAB3.TOAST_TITLE_WARNING').subscribe((res: string) => {
+        this.toastService.presentToast(res, 'warning');
+      });
       return;
     }
 
@@ -115,12 +120,16 @@ export class Tab3Page implements OnInit {
     this.custoMaoDeObra = 0;
     this.custoMateriais = 0;
     this.lucro = 0;
-    this.toastService.presentToast('Orçamento salvo com sucesso!', 'success');
+    this.translate.get('TAB3.TOAST_SAVED').subscribe((res: string) => {
+      this.toastService.presentToast(res, 'success');
+    });
   }
 
   removerOrcamento(id: string) {
     this.dataService.deleteOrcamento(id);
-    this.toastService.presentToast('Orçamento removido.', 'primary');
+    this.translate.get('TAB3.TOAST_REMOVED').subscribe((res: string) => {
+      this.toastService.presentToast(res, 'primary');
+    });
   }
 
   acaoComAnuncio(tipo: 'whatsapp' | 'pdf', orcamento: Orcamento) {
@@ -134,21 +143,24 @@ export class Tab3Page implements OnInit {
     });
   }
 
-  compartilharWhatsApp(orcamento: Orcamento) {
+  async compartilharWhatsApp(orcamento: Orcamento) {
     const totalFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(orcamento.precoFinal);
     
-    let texto = `*Orçamento: ${orcamento.titulo}*\n\n`;
-    texto += `Horas Estimadas: ${orcamento.horasEstimadas}h\n`;
+    // Obter traduções assincronamente
+    const translations = await firstValueFrom(this.translate.get('WHATSAPP'));
+
+    let texto = `*${translations.BUDGET_TITLE}: ${orcamento.titulo}*\n\n`;
+    texto += `${translations.ESTIMATED_HOURS}: ${orcamento.horasEstimadas}h\n`;
     
     if (orcamento.materiaisUsados.length > 0) {
-      texto += `Materiais/Custos:\n`;
+      texto += `${translations.MATERIALS_COSTS}:\n`;
       orcamento.materiaisUsados.forEach(id => {
         const mat = this.materiaisDisponiveis.find(m => m.id === id);
         if (mat) texto += `- ${mat.nome}\n`;
       });
     }
     
-    texto += `\n*Valor Total: ${totalFormatado}*`;
+    texto += `\n*${translations.TOTAL_VALUE}: ${totalFormatado}*`;
     
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank');
@@ -157,10 +169,13 @@ export class Tab3Page implements OnInit {
   async gerarPDF(orcamento: Orcamento) {
     const totalFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(orcamento.precoFinal);
     
+    // Obter traduções
+    const t = await firstValueFrom(this.translate.get('PDF'));
+
     // 1. Preparar a lista de materiais para a tabela do PDF
     const linhasMateriais = [];
     if (orcamento.materiaisUsados && orcamento.materiaisUsados.length > 0) {
-      linhasMateriais.push([{ text: 'Material / Custo Extra', bold: true }, { text: 'Valor', bold: true }]);
+      linhasMateriais.push([{ text: t.MATERIALS_HEADER, bold: true }, { text: t.VALUE_HEADER, bold: true }]);
       
       orcamento.materiaisUsados.forEach(id => {
         const mat = this.materiaisDisponiveis.find(m => m.id === id);
@@ -172,24 +187,24 @@ export class Tab3Page implements OnInit {
         }
       });
     } else {
-      linhasMateriais.push(['Sem custos extras registados', '-']);
+      linhasMateriais.push([t.NO_EXTRA_COSTS, '-']);
     }
 
     // 2. Desenhar a estrutura do documento
-    const nomeEmpresa = this.config?.nome || 'Orçamento';
+    const nomeEmpresa = this.config?.nome || t.DEFAULT_TITLE;
     
     const docDefinition: any = {
       content: [
         { text: nomeEmpresa, style: 'header', alignment: 'center' },
-        { text: 'Proposta de Orçamento', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
+        { text: t.PROPOSAL_SUBTITLE, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] },
         
-        { text: `Projeto: ${orcamento.titulo}`, style: 'h3' },
-        { text: `Data: ${new Date().toLocaleDateString('pt-BR')}`, margin: [0, 0, 0, 20] },
+        { text: `${t.PROJECT_LABEL}: ${orcamento.titulo}`, style: 'h3' },
+        { text: `${t.DATE_LABEL}: ${new Date().toLocaleDateString('pt-BR')}`, margin: [0, 0, 0, 20] },
         
-        { text: 'Mão de Obra (Horas Estimadas)', style: 'sectionHeader' },
-        { text: `${orcamento.horasEstimadas}h de trabalho dedicado ao projeto.`, margin: [0, 0, 0, 15] },
+        { text: t.LABOR_SECTION, style: 'sectionHeader' },
+        { text: `${orcamento.horasEstimadas}h ${t.LABOR_DESC}`, margin: [0, 0, 0, 15] },
 
-        { text: 'Custos Adicionais e Materiais', style: 'sectionHeader' },
+        { text: t.MATERIALS_SECTION, style: 'sectionHeader' },
         {
           table: {
             headerRows: 1,
@@ -199,7 +214,7 @@ export class Tab3Page implements OnInit {
           margin: [0, 0, 0, 20]
         },
 
-        { text: `Valor Total Sugerido: ${totalFormatado}`, style: 'total', alignment: 'right' }
+        { text: `${t.TOTAL_SUGGESTED}: ${totalFormatado}`, style: 'total', alignment: 'right' }
       ],
       styles: {
         header: { fontSize: 22, bold: true, color: '#3880ff' },
@@ -239,7 +254,9 @@ export class Tab3Page implements OnInit {
       
     } catch (error) {
       console.error('Erro ao gerar ou partilhar o PDF', error);
-      this.toastService.presentToast('Erro ao gerar PDF. Verifique permissões.', 'danger');
+      this.translate.get('TAB3.TOAST_PDF_ERROR').subscribe((res: string) => {
+        this.toastService.presentToast(res, 'danger');
+      });
     }
   }
 }

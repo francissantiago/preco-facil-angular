@@ -1,37 +1,37 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Orçamentos</ion-title>
+    <ion-title>{{ 'TAB3.TITLE' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Orçamentos</ion-title>
+      <ion-title size="large">{{ 'TAB3.TITLE' | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-accordion-group>
     <ion-accordion value="new">
       <ion-item slot="header" color="light">
-        <ion-label>Novo Orçamento</ion-label>
+        <ion-label>{{ 'TAB3.NEW_BUDGET_TITLE' | translate }}</ion-label>
         <ion-icon name="calculator" slot="start"></ion-icon>
       </ion-item>
       <div class="ion-padding" slot="content">
         
         <ion-item>
-          <ion-input label="Título do Projeto" labelPlacement="stacked" [(ngModel)]="novoOrcamento.titulo" placeholder="Ex: Site Institucional"></ion-input>
+          <ion-input [label]="'TAB3.PROJECT_TITLE_LABEL' | translate" labelPlacement="stacked" [(ngModel)]="novoOrcamento.titulo" [placeholder]="'TAB3.PROJECT_TITLE_PLACEHOLDER' | translate"></ion-input>
         </ion-item>
 
         <ion-item>
-          <ion-input label="Horas Estimadas" labelPlacement="stacked" type="number" [(ngModel)]="novoOrcamento.horasEstimadas" (ionInput)="calcular()" placeholder="0"></ion-input>
+          <ion-input [label]="'TAB3.ESTIMATED_HOURS_LABEL' | translate" labelPlacement="stacked" type="number" [(ngModel)]="novoOrcamento.horasEstimadas" (ionInput)="calcular()" placeholder="0"></ion-input>
           <ion-note slot="end" *ngIf="config?.valorHoraCalculado">
             x {{ config?.valorHoraCalculado | currency:'BRL' }}/h
           </ion-note>
         </ion-item>
 
         <ion-item>
-          <ion-select label="Materiais/Custos Extras" labelPlacement="stacked" [multiple]="true" [(ngModel)]="novoOrcamento.materiaisSelecionados" (ionChange)="calcular()" placeholder="Selecione...">
+          <ion-select [label]="'TAB3.MATERIALS_LABEL' | translate" labelPlacement="stacked" [multiple]="true" [(ngModel)]="novoOrcamento.materiaisSelecionados" (ionChange)="calcular()" [placeholder]="'TAB3.MATERIALS_PLACEHOLDER' | translate">
             <ion-select-option *ngFor="let mat of materiaisDisponiveis" [value]="mat.id">
               {{ mat.nome }} ({{ mat.custo | currency:'BRL' }})
             </ion-select-option>
@@ -39,32 +39,32 @@
         </ion-item>
 
         <ion-item>
-          <ion-input label="Margem de Lucro (%)" labelPlacement="stacked" type="number" [(ngModel)]="novoOrcamento.margemLucroPercentual" (ionInput)="calcular()" placeholder="20"></ion-input>
+          <ion-input [label]="'TAB3.PROFIT_MARGIN_LABEL' | translate" labelPlacement="stacked" type="number" [(ngModel)]="novoOrcamento.margemLucroPercentual" (ionInput)="calcular()" placeholder="20"></ion-input>
         </ion-item>
 
         <ion-card color="light" class="ion-margin-top">
           <ion-card-content>
-            <p>Mão de Obra: {{ custoMaoDeObra | currency:'BRL' }}</p>
-            <p>Materiais: {{ custoMateriais | currency:'BRL' }}</p>
-            <p>Lucro Estimado: {{ lucro | currency:'BRL' }}</p>
+            <p>{{ 'TAB3.LABOR_COST' | translate }}: {{ custoMaoDeObra | currency:'BRL' }}</p>
+            <p>{{ 'TAB3.MATERIALS_COST' | translate }}: {{ custoMateriais | currency:'BRL' }}</p>
+            <p>{{ 'TAB3.ESTIMATED_PROFIT' | translate }}: {{ lucro | currency:'BRL' }}</p>
             <h2 class="ion-text-center ion-margin-top" style="font-weight: bold; font-size: 1.5em;">
-              Total: {{ novoOrcamento.precoFinal | currency:'BRL' }}
+              {{ 'TAB3.TOTAL_LABEL' | translate }}: {{ novoOrcamento.precoFinal | currency:'BRL' }}
             </h2>
           </ion-card-content>
         </ion-card>
 
         <ion-button expand="block" (click)="salvarOrcamento()" [disabled]="!novoOrcamento.titulo">
-          Salvar Orçamento
+          {{ 'TAB3.SAVE_BUTTON' | translate }}
         </ion-button>
 
       </div>
     </ion-accordion>
   </ion-accordion-group>
 
-  <h3 class="ion-margin-top">Histórico</h3>
+  <h3 class="ion-margin-top">{{ 'TAB3.HISTORY_TITLE' | translate }}</h3>
 
   <div *ngIf="orcamentos.length === 0" class="ion-text-center ion-padding">
-    <p color="medium">Nenhum orçamento salvo.</p>
+    <p color="medium">{{ 'TAB3.EMPTY_HISTORY' | translate }}</p>
   </div>
 
   <ion-card *ngFor="let orcamento of orcamentos">
@@ -73,19 +73,19 @@
       <ion-card-subtitle>{{ orcamento.dataCriacao | date:'short' }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      <p><strong>Preço Final: {{ orcamento.precoFinal | currency:'BRL' }}</strong></p>
-      <p>Horas: {{ orcamento.horasEstimadas }}h</p>
-      <p>Margem: {{ orcamento.margemLucroPercentual }}%</p>
+      <p><strong>{{ 'TAB3.FINAL_PRICE' | translate }}: {{ orcamento.precoFinal | currency:'BRL' }}</strong></p>
+      <p>{{ 'TAB3.HOURS' | translate }}: {{ orcamento.horasEstimadas }}h</p>
+      <p>{{ 'TAB3.MARGIN' | translate }}: {{ orcamento.margemLucroPercentual }}%</p>
       
       <div class="ion-margin-top" style="display: flex; gap: 10px; flex-wrap: wrap;">
         <ion-button fill="outline" color="success" expand="block" style="flex: 1; min-width: 110px;" (click)="acaoComAnuncio('whatsapp', orcamento)">
           <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
-          WhatsApp
+          {{ 'TAB3.WHATSAPP_BUTTON' | translate }}
         </ion-button>
         
         <ion-button fill="outline" color="tertiary" expand="block" style="flex: 1; min-width: 110px;" (click)="acaoComAnuncio('pdf', orcamento)">
           <ion-icon name="document-text" slot="start"></ion-icon>
-          PDF
+          {{ 'TAB3.PDF_BUTTON' | translate }}
         </ion-button>
 
         <ion-button fill="outline" color="danger" (click)="removerOrcamento(orcamento.id)">
@@ -97,8 +97,8 @@
   
   <!-- <div class="ion-padding ion-text-center ion-margin-top">
       <p style="font-size: 0.8em; color: gray;">
-        Apoie o desenvolvedor: 
-        <a href="#" style="text-decoration: none; font-weight: bold;">Buy me a Coffee ☕</a>
+        {{ 'TAB3.SUPPORT_DEV' | translate }}: 
+        <a href="#" style="text-decoration: none; font-weight: bold;">{{ 'TAB3.BUY_COFFEE' | translate }}</a>
       </p>
   </div> -->
 

@@ -9,13 +9,14 @@ import { ConfiguracaoBase } from '../models/interfaces';
 import { addIcons } from 'ionicons';
 import { moon, sunny, settings, phonePortrait, documentText, shieldCheckmark } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonNote, IonButton, IonSegment, IonSegmentButton, IonIcon, RouterLink],
+  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonNote, IonButton, IonSegment, IonSegmentButton, IonIcon, RouterLink, TranslateModule],
 })
 export class Tab1Page implements OnInit {
   config: ConfiguracaoBase = {
@@ -30,7 +31,8 @@ export class Tab1Page implements OnInit {
   constructor(
     private dataService: DataService,
     private themeService: ThemeService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private translate: TranslateService
   ) {
     addIcons({ moon, sunny, settings, phonePortrait, documentText, shieldCheckmark });
   }
@@ -46,7 +48,9 @@ export class Tab1Page implements OnInit {
 
   saveConfig() {
     this.dataService.updateConfiguracao(this.config);
-    this.toastService.presentToast('Configurações salvas com sucesso!', 'success');
+    this.translate.get('TAB1.TOAST_SUCCESS').subscribe((res: string) => {
+      this.toastService.presentToast(res, 'success');
+    });
   }
 
   calculateHora() {

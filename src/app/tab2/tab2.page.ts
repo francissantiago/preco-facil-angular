@@ -7,13 +7,14 @@ import { ToastService } from '../services/toast.service';
 import { Material } from '../models/interfaces';
 import { addIcons } from 'ionicons';
 import { trash, add } from 'ionicons/icons';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonListHeader, IonCardContent, IonCardTitle, IonCardHeader, IonCard, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption]
+  imports: [IonListHeader, IonCardContent, IonCardTitle, IonCardHeader, IonCard, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, TranslateModule]
 })
 export class Tab2Page implements OnInit {
   materiais: Material[] = [];
@@ -21,7 +22,8 @@ export class Tab2Page implements OnInit {
 
   constructor(
     private dataService: DataService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private translate: TranslateService
   ) {
     addIcons({ trash, add });
   }
@@ -39,14 +41,20 @@ export class Tab2Page implements OnInit {
         custo: Number(this.novoMaterial.custo)
       });
       this.novoMaterial = { nome: '', custo: null };
-      this.toastService.presentToast('Material adicionado com sucesso!', 'success');
+      this.translate.get('TAB2.TOAST_ADDED').subscribe((res: string) => {
+        this.toastService.presentToast(res, 'success');
+      });
     } else {
-      this.toastService.presentToast('Preencha o nome e o custo do material.', 'warning');
+      this.translate.get('TAB2.TOAST_WARNING').subscribe((res: string) => {
+        this.toastService.presentToast(res, 'warning');
+      });
     }
   }
 
   removerMaterial(id: string) {
     this.dataService.deleteMaterial(id);
-    this.toastService.presentToast('Material removido.', 'primary');
+    this.translate.get('TAB2.TOAST_REMOVED').subscribe((res: string) => {
+      this.toastService.presentToast(res, 'primary');
+    });
   }
 }

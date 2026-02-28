@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Meu Valor
+      {{ 'TAB1.TITLE' | translate }}
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,34 +9,34 @@
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Meu Valor</ion-title>
+      <ion-title size="large">{{ 'TAB1.TITLE' | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Configuração Base</ion-card-title>
+      <ion-card-title>{{ 'TAB1.CONFIG_BASE_TITLE' | translate }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <p>Defina suas metas e custos para calcular o valor da sua hora de trabalho.</p>
+      <p>{{ 'TAB1.CONFIG_BASE_DESC' | translate }}</p>
       
       <ion-item class="ion-margin-top">
-        <ion-input label="Seu Nome / Empresa" labelPlacement="stacked" type="text" [(ngModel)]="config.nome" placeholder="Ex: Ateliê da Maria"></ion-input>
-        <ion-note slot="helper">Será usado no orçamento gerado</ion-note>
+        <ion-input [label]="'TAB1.NAME_LABEL' | translate" labelPlacement="stacked" type="text" [(ngModel)]="config.nome" [placeholder]="'TAB1.NAME_PLACEHOLDER' | translate"></ion-input>
+        <ion-note slot="helper">{{ 'TAB1.NAME_HELPER' | translate }}</ion-note>
       </ion-item>
 
       <ion-item class="ion-margin-top">
-        <ion-input label="Meta Salarial Mensal (R$)" label-placement="stacked" type="number" [(ngModel)]="config.metaMensal" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
+        <ion-input [label]="'TAB1.SALARY_GOAL_LABEL' | translate" label-placement="stacked" type="number" [(ngModel)]="config.metaMensal" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
       </ion-item>
 
       <ion-item class="ion-margin-top">
-        <ion-input label="Custos Fixos Mensais (R$)" label-placement="stacked" type="number" [(ngModel)]="config.custosFixos" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
-        <ion-note slot="helper">Internet, Luz, MEI, Ferramentas...</ion-note>
+        <ion-input [label]="'TAB1.FIXED_COSTS_LABEL' | translate" label-placement="stacked" type="number" [(ngModel)]="config.custosFixos" (ionInput)="calculateHora()" placeholder="0.00"></ion-input>
+        <ion-note slot="helper">{{ 'TAB1.FIXED_COSTS_HELPER' | translate }}</ion-note>
       </ion-item>
 
       <ion-item class="ion-margin-top">
-        <ion-input label="Horas de Trabalho / Mês" label-placement="stacked" type="number" [(ngModel)]="config.horasPorMes" (ionInput)="calculateHora()" placeholder="160"></ion-input>
-        <ion-note slot="helper">Ex: 160h (8h/dia x 20 dias)</ion-note>
+        <ion-input [label]="'TAB1.HOURS_LABEL' | translate" label-placement="stacked" type="number" [(ngModel)]="config.horasPorMes" (ionInput)="calculateHora()" placeholder="160"></ion-input>
+        <ion-note slot="helper">{{ 'TAB1.HOURS_HELPER' | translate }}</ion-note>
       </ion-item>
 
     </ion-card-content>
@@ -44,21 +44,21 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Aparência</ion-card-title>
+      <ion-card-title>{{ 'TAB1.APPEARANCE_TITLE' | translate }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-segment [value]="currentTheme" (ionChange)="changeTheme($event)">
         <ion-segment-button value="light">
           <ion-icon name="sunny"></ion-icon>
-          <ion-label>Claro</ion-label>
+          <ion-label>{{ 'TAB1.THEME_LIGHT' | translate }}</ion-label>
         </ion-segment-button>
         <ion-segment-button value="dark">
           <ion-icon name="moon"></ion-icon>
-          <ion-label>Escuro</ion-label>
+          <ion-label>{{ 'TAB1.THEME_DARK' | translate }}</ion-label>
         </ion-segment-button>
         <ion-segment-button value="system">
           <ion-icon name="phone-portrait"></ion-icon>
-          <ion-label>Sistema</ion-label>
+          <ion-label>{{ 'TAB1.THEME_SYSTEM' | translate }}</ion-label>
         </ion-segment-button>
       </ion-segment>
     </ion-card-content>
@@ -66,27 +66,27 @@
 
   <ion-card color="primary">
     <ion-card-header>
-      <ion-card-title>Sua Hora Técnica</ion-card-title>
+      <ion-card-title>{{ 'TAB1.HOURLY_RATE_TITLE' | translate }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <h1 style="font-size: 3em; font-weight: bold; text-align: center;">
         {{ config.valorHoraCalculado | currency:'BRL' }}
       </h1>
-      <p style="text-align: center;">Este é o valor mínimo que você deve cobrar por hora para atingir sua meta.</p>
+      <p style="text-align: center;">{{ 'TAB1.HOURLY_RATE_DESC' | translate }}</p>
     </ion-card-content>
   </ion-card>
 
   <ion-button expand="block" (click)="saveConfig()" class="ion-margin-top">
-    Salvar Configurações
+    {{ 'TAB1.SAVE_CONFIG' | translate }}
   </ion-button>
 
   <div class="ion-padding ion-text-center" style="margin-top: 20px;">
     <p style="font-size: 0.9em;">
       <a [routerLink]="['/privacy']" style="text-decoration: none; margin-right: 15px;">
-        <ion-icon name="shield-checkmark" style="vertical-align: middle;"></ion-icon> Privacidade
+        <ion-icon name="shield-checkmark" style="vertical-align: middle;"></ion-icon> {{ 'TAB1.PRIVACY' | translate }}
       </a>
       <a [routerLink]="['/terms']" style="text-decoration: none;">
-        <ion-icon name="document-text" style="vertical-align: middle;"></ion-icon> Termos de Uso
+        <ion-icon name="document-text" style="vertical-align: middle;"></ion-icon> {{ 'TAB1.TERMS' | translate }}
       </a>
     </p>
   </div>
