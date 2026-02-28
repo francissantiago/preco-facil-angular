@@ -6,7 +6,7 @@ import { DataService } from '../services/data.service';
 import { ToastService } from '../services/toast.service';
 import { Orcamento } from '../models/interfaces';
 import { addIcons } from 'ionicons';
-import { logoWhatsapp, trash, calculator, shareSocial, globe, timeOutline, trendingUpOutline, documentText } from 'ionicons/icons';
+import { logoWhatsapp, trash, calculator, shareSocial, globe, timeOutline, trendingUpOutline } from 'ionicons/icons';
 import { AdMobService } from '../services/admob.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
@@ -89,7 +89,7 @@ export class Tab3Page implements OnInit {
   });
 
   constructor() {
-    addIcons({calculator,timeOutline,trendingUpOutline,logoWhatsapp,documentText,trash,shareSocial,globe});
+    addIcons({ logoWhatsapp, trash, calculator, shareSocial, globe, timeOutline, trendingUpOutline });
   }
 
   ngOnInit() {
