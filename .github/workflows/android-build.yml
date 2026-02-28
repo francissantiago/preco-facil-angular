@@ -44,10 +44,23 @@ jobs:
           cd android
           ./gradlew assembleDebug
 
-      - name: 9. Compilar o AAB (Para enviar para a Google Play Console)
+      - name: 9. Decodificar Keystore e Compilar AAB Assinado
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
         run: |
+          # Transforma o texto de volta num ficheiro no servidor do GitHub
+          echo $KEYSTORE_BASE64 | base64 --decode > $RUNNER_TEMP/keystore.jks
+          
+          # Entra na pasta e compila injetando a assinatura
           cd android
-          ./gradlew bundleRelease
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file=$RUNNER_TEMP/keystore.jks \
+            -Pandroid.injected.signing.store.password=$STORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
 
       - name: 10. Disponibilizar o APK para Download
         uses: actions/upload-artifact@v4
