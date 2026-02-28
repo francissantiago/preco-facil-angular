@@ -1,32 +1,4 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      {{ 'TAB1.TITLE' | translate }}
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button id="language-trigger">
-        <ion-icon slot="icon-only" name="globe"></ion-icon>
-      </ion-button>
-      <ion-popover trigger="language-trigger" triggerAction="click" #popover>
-        <ng-template>
-          <ion-content>
-            <ion-list>
-              <ion-item button (click)="changeLanguage({detail: {value: 'pt-BR'}}); popover.dismiss()" detail="false">
-                <ion-label>Português</ion-label>
-              </ion-item>
-              <ion-item button (click)="changeLanguage({detail: {value: 'en'}}); popover.dismiss()" detail="false">
-                <ion-label>English</ion-label>
-              </ion-item>
-              <ion-item button (click)="changeLanguage({detail: {value: 'es'}}); popover.dismiss()" detail="false">
-                <ion-label>Español</ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-content>
-        </ng-template>
-      </ion-popover>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<app-header title="TAB1.TITLE"></app-header>
 
 <ion-content [fullscreen]="true" class="ion-padding bg-gray-50 dark:bg-zinc-900">
   <ion-header collapse="condense">

@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonTextarea, IonAccordionGroup, IonAccordion, IonNote, IonCardSubtitle, IonButtons, IonPopover, IonListHeader } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonAccordionGroup, IonAccordion } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
 import { ToastService } from '../services/toast.service';
-import { Material, Orcamento, ConfiguracaoBase } from '../models/interfaces';
+import { Orcamento } from '../models/interfaces';
 import { addIcons } from 'ionicons';
-import { logoWhatsapp, trash, calculator, shareSocial, globe, timeOutline, trendingUpOutline } from 'ionicons/icons';
+import { logoWhatsapp, trash, calculator, shareSocial, globe, timeOutline, trendingUpOutline, documentText } from 'ionicons/icons';
 import { AdMobService } from '../services/admob.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
@@ -21,15 +21,16 @@ import { Share } from '@capacitor/share';
 // Injeção das fontes no pdfMake para suportar acentuação e caracteres latinos
 // (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
+import { AppHeaderComponent } from '../components/app-header/app-header.component';
+
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, IonNote, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonAccordionGroup, IonAccordion, IonButtons, IonPopover, IonList, TranslateModule]
+  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSelect, IonSelectOption, IonAccordionGroup, IonAccordion, TranslateModule, AppHeaderComponent]
 })
 export class Tab3Page implements OnInit {
-  @ViewChild('popover') popover: any;
   
   private dataService = inject(DataService);
   private admobService = inject(AdMobService);
@@ -88,7 +89,7 @@ export class Tab3Page implements OnInit {
   });
 
   constructor() {
-    addIcons({ logoWhatsapp, trash, calculator, shareSocial, globe, timeOutline, trendingUpOutline });
+    addIcons({calculator,timeOutline,trendingUpOutline,logoWhatsapp,documentText,trash,shareSocial,globe});
   }
 
   ngOnInit() {
@@ -139,12 +140,6 @@ export class Tab3Page implements OnInit {
     this.translate.get('TAB3.TOAST_REMOVED').subscribe((res: string) => {
       this.toastService.presentToast(res, 'primary');
     });
-  }
-
-  changeLanguage(event: any) {
-    if (event.detail && event.detail.value) {
-      this.translate.use(event.detail.value);
-    }
   }
 
   acaoComAnuncio(tipo: 'whatsapp' | 'pdf', orcamento: Orcamento) {

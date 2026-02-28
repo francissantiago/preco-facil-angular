@@ -1,0 +1,29 @@
+<ion-header [translucent]="true" class="no-border">
+  <ion-toolbar class="bg-white dark:bg-gray-900">
+    <ion-title class="text-xl font-bold text-gray-900 dark:text-white">
+      {{ title | translate }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button id="language-trigger-header" class="text-blue-600 dark:text-blue-400">
+        <ion-icon slot="icon-only" name="globe"></ion-icon>
+      </ion-button>
+      <ion-popover trigger="language-trigger-header" triggerAction="click" #popover class="rounded-xl">
+        <ng-template>
+          <ion-content class="ion-no-padding">
+            <ion-list lines="none" class="py-2">
+              <ion-item button (click)="changeLanguage('pt-BR'); popover.dismiss()" detail="false" class="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <ion-label class="font-medium">Português</ion-label>
+              </ion-item>
+              <ion-item button (click)="changeLanguage('en'); popover.dismiss()" detail="false" class="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <ion-label class="font-medium">English</ion-label>
+              </ion-item>
+              <ion-item button (click)="changeLanguage('es'); popover.dismiss()" detail="false" class="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <ion-label class="font-medium">Español</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>

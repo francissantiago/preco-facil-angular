@@ -1,24 +1,24 @@
-import { Component, OnInit, ViewChild, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonListHeader, IonButtons, IonPopover } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
 import { DataService } from '../services/data.service';
 import { ToastService } from '../services/toast.service';
-import { Material } from '../models/interfaces';
 import { addIcons } from 'ionicons';
-import { trash, add, globe } from 'ionicons/icons';
+import { trash, add } from 'ionicons/icons';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+
+import { AppHeaderComponent } from '../components/app-header/app-header.component';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonListHeader, IonCardContent, IonCardTitle, IonCardHeader, IonCard, CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, IonButtons, IonPopover, TranslateModule]
+  imports: [CommonModule, FormsModule, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonItemSliding, IonItemOptions, IonItemOption, TranslateModule, AppHeaderComponent]
 })
 export class Tab2Page implements OnInit {
-  @ViewChild('popover') popover: any;
   
   private dataService = inject(DataService);
   private toastService = inject(ToastService);
@@ -32,7 +32,7 @@ export class Tab2Page implements OnInit {
   novoMaterial = signal<{ nome: string; custo: number | null }>({ nome: '', custo: null });
 
   constructor() {
-    addIcons({ trash, add, globe });
+    addIcons({ trash, add });
   }
 
   ngOnInit() {
